@@ -1,0 +1,10 @@
+version = 0.1
+[development.deploy.parameters]
+stack_name = "lama-blog-development-stack"
+resolve_s3 = true
+s3_prefix = "lama-blog-development-stack"
+region = "us-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+parameter_overrides = "Project=\"lama-blog\" Stage=\"development\" Prefix=\"${Project}-${Stage}\" ApiName=\"${prefix}-api\""

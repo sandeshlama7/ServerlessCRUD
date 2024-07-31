@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform:
+  - AWS::LanguageExtensions
+  - AWS::Serverless-2016-10-31
+Description: "Creating the Services Resources for the Serverless Application"
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 180
+    Architectures: [x86_64]
+
+Parameters:
+  Project:
+    Type: String
+    Default: "lamablog"
+  Stage:
+    Type: String
+    Default: "development"
+    AllowedValues:
+      - "development"
+      - "production"
+      - "testing"
+  Prefix:
+    Type: String
+    Default: "${Project}-${Stage}"
+  LambdaName:
+    Type: String
+    Default: "lamablogdevelopmentApiHandler"
+
+  ApiName:
+    Type: String
+    Description: The Name of the Rest API
+    Default: "${prefix}-api"
+
+Resources:
+  BackendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Ref LambdaName
+      CodeUri: lambda/
+      Handler: lambda_function.lambda_handler
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+      # VpcConfig:
+        # SecurityGroupIds:
+        #   - sg-085912345678492fb
+        # SubnetIds:
+        #   - subnet-071f712345678e7c8
+        #   - subnet-07fd123456788a036
+      Events:
+        GetPosts:
+          Type: Api
+          Properties:
+            Path: /posts
+            Method: GET
+            RestApiId: !Ref BackendAPI
+        GetPost:
+          Type: Api
+          Properties:
+            Path: /posts/{id}
+            Method: GET
+            RestApiId: !Ref BackendAPI
+        AddPost:
+          Type: Api
+          Properties:
+            Path: /posts
+            Method: POST
+            RestApiId: !Ref BackendAPI
+        DeletePost:
+          Type: Api
+          Properties:
+            Path: /posts/{id}
+            Method: DELETE
+            RestApiId: !Ref BackendAPI
+
+  BackendAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      # ApiKeySourceType: HEADER
+      EndpointConfiguration: REGIONAL
+      Name: !Ref ApiName
+      StageName: !Ref Stage
