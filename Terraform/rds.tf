@@ -28,11 +28,13 @@ module "rds" {
   create_db_subnet_group = true
   subnet_ids             = module.vpc.private_subnets
 
-  #   # DB parameter group
-  family = "mysql8.0"
+  # DB parameter group
+  create_db_parameter_group = false
+  # family = "mysql8.0"
 
-  #   # DB option group
-  major_engine_version = "8.0"
+  # DB option group
+  create_db_option_group = false
+  # major_engine_version = "8.0"
 
   #   # Database Deletion Protection
   # #   deletion_protection = true

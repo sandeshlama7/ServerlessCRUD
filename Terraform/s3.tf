@@ -20,8 +20,7 @@ module "s3_bucket" {
         Effect    = "Allow"
         Principal = "*"
         Action    = "s3:GetObject"
-        # Resource  = "${module.s3_bucket.bucket_arn}/*"
-        Resource = "arn:aws:s3:::${local.frontend_bucket.name}/*"
+        Resource  = "arn:aws:s3:::${local.frontend_bucket.name}/*"
       }
     ]
   })

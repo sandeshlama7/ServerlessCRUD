@@ -6,12 +6,12 @@ module "rds_proxy" {
   vpc_subnet_ids         = module.vpc.private_subnets
   vpc_security_group_ids = [module.vpc.default_security_group_id]
 
-    auth = {
-      "blog" = {
-        description = "RDS MySQL admin password"
-        secret_arn  = module.rds.db_instance_master_user_secret_arn
-      }
+  auth = {
+    "blog" = {
+      description = "RDS MySQL admin password"
+      secret_arn  = module.rds.db_instance_master_user_secret_arn
     }
+  }
 
   # Target MySQL Instance
   engine_family = "MYSQL"

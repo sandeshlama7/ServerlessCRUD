@@ -12,11 +12,13 @@ locals {
   number_of_azs = var.number_of_azs
 
   ###### Tags
-  project     = var.project
-  environment = var.environment
+  project_short = var.project_short
+  project       = var.project
+  environment   = var.environment
 
   ###### RDS
-  rds_identifier    = "${local.prefix}-db"
+  # rds_identifier    = "${local.prefix}-db"
+  rds_identifier    = module.naming.resources.rds.name
   engine            = var.engine
   engine_version    = var.engine_version
   db_instance_class = var.db_instance_class
@@ -26,6 +28,7 @@ locals {
 
   #### S3
   frontend_bucket = {
-    name = "${local.prefix}-frontend-bucket"
+    name = "${local.project}.sandbox.adex.ltd"
+    # name = module.naming.resources.s3.name
   }
 }

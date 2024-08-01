@@ -1,6 +1,7 @@
 module "naming" {
   source         = "./modules/naming"
-  app_name_short = "lb"
-  app_name       = "lama-blog"
+  app_name       = local.project
+  app_name_short = local.project_short
   environment    = local.environment
+  project_prefix = "sandesh"
 }

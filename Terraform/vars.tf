@@ -19,6 +19,12 @@ variable "project" {
   default     = "lama-blog"
 }
 
+variable "project_short" {
+  description = "Short form of the project"
+  type        = string
+  default     = "lb"
+}
+
 variable "environment" {
   description = "Environment of the project"
   type        = string

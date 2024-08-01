@@ -1,5 +1,6 @@
 vpc_cidr          = "10.0.16.0/24"
-project           = "lama-blog"
+project           = "lamablog"
+project_short     = "lb"
 environment       = "development"
 number_of_azs     = 2
 engine            = "mysql"
