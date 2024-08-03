@@ -37,12 +37,13 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ env.region }}
 
-      - name: Validate terraform
-        run: terraform validate
-        working-directory: ${{env.tf_dir}}
 
       - name: Terraform Init
         run: terraform init  -backend-config="bucket=${{env.backend-bucket}}" -backend-config="key=${{env.backend-key}}" -backend-config="region=${{env.region}}"
+        working-directory: ${{env.tf_dir}}
+
+      - name: Validate terraform
+        run: terraform validate
         working-directory: ${{env.tf_dir}}
 
       - name: Terraform apply
