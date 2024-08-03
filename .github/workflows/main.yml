@@ -5,8 +5,8 @@ run-name: ${{ github.actor }} committed
 on:
   push:
     branches: [ "infra", "main" ]
-  pull_request:
-    branches: [ "main" ]
+  # pull_request:
+  #   branches: [ "main" ]
 
 env:
   tf_dir: Terraform
