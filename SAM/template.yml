@@ -6,49 +6,76 @@ Description: "Creating the Services Resources for the Serverless Application"
 
 Globals:
   Function:
-    Runtime: nodejs20.x
+    Runtime: python3.12
     Timeout: 180
     Architectures: [x86_64]
 
 Parameters:
   Project:
     Type: String
-    Default: "lamablog"
+    Default: lamablog
   Stage:
     Type: String
-    Default: "development"
+    Default: development
     AllowedValues:
-      - "development"
-      - "production"
-      - "testing"
-  Prefix:
-    Type: String
-    Default: "${Project}-${Stage}"
-  LambdaName:
-    Type: String
-    Default: "lamablogdevelopmentApiHandler"
+      - development
+      - production
+      - testing
+  # Prefix:
+  #   Type: String
+  #   Default: !Sub "${Project}-${Stage}"
+  VpcSG:
+    Type: CommaDelimitedList
+    Default: "sg-074f3b2bb01084cd9"
 
-  ApiName:
-    Type: String
-    Description: The Name of the Rest API
-    Default: "${prefix}-api"
 
 Resources:
   BackendFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Ref LambdaName
+      FunctionName: !Sub "${Project}-${Stage}-BackendFunction"
+      MemorySize: 128
       CodeUri: lambda/
       Handler: lambda_function.lambda_handler
       Policies:
         - AWSLambdaVPCAccessExecutionRole
-      # VpcConfig:
-        # SecurityGroupIds:
-        #   - sg-085912345678492fb
-        # SubnetIds:
-        #   - subnet-071f712345678e7c8
-        #   - subnet-07fd123456788a036
+        - Statement:
+          - Sid: GetSecrets
+            Effect: Allow
+            Action:
+            - secretsmanager:GetSecretValue
+            Resource: '*'
+          - Sid: RDSConnect
+            Effect: Allow
+            Action:
+            - rds-db:connect
+            Resource: '*'
+
+      VpcConfig:
+        SecurityGroupIds: !Ref VpcSG
+        SubnetIds:
+          - subnet-0e202abab09252c19
+          - subnet-0b0603b1f01c4ef5d
+
+      Environment:
+        Variables:
+          DB_NAME: "blog"
+          USERNAME: "something"
+          RDS_PROXY_HOST: "something"
+
       Events:
+        RegisterUser:
+          Type: Api
+          Properties:
+            Path: /register
+            Method: POST
+            RestApiId: !Ref BackendAPI
+        LoginUser:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: GET
+            RestApiId: !Ref BackendAPI
         GetPosts:
           Type: Api
           Properties:
@@ -73,11 +100,17 @@ Resources:
             Path: /posts/{id}
             Method: DELETE
             RestApiId: !Ref BackendAPI
+        UpdatePost:
+          Type: Api
+          Properties:
+            Path: /posts/{id}
+            Method: PUT
+            RestApiId: !Ref BackendAPI
 
   BackendAPI:
     Type: AWS::Serverless::Api
     Properties:
       # ApiKeySourceType: HEADER
       EndpointConfiguration: REGIONAL
-      Name: !Ref ApiName
+      Name: !Sub "${Project}-${Stage}-api"
       StageName: !Ref Stage

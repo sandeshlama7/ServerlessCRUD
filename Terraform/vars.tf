@@ -4,6 +4,11 @@ variable "region" {
   default     = "us-east-1"
 }
 
+variable "naming_prefix" {
+  description = "The prefix required for the naming module"
+  type = string
+}
+
 ########################
 # VPC variables
 ########################
@@ -38,10 +43,10 @@ variable "number_of_azs" {
 ########################
 # S3 variables
 ########################
-# variable "force_destroy" {
-#   description = "Whether to force destroy the bucket"
-#   type        = bool
-# }
+variable "s3force_destroy" {
+  description = "Whether to force destroy the bucket"
+  type        = bool
+}
 
 
 ##################

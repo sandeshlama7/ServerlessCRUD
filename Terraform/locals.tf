@@ -1,6 +1,7 @@
 locals {
   region = var.region
   prefix = "${var.project}-${var.environment}"
+  naming_prefix = var.naming_prefix
 
   ###### VPC
   vpc = {
@@ -28,7 +29,10 @@ locals {
 
   #### S3
   frontend_bucket = {
-    name = "${local.project}.sandbox.adex.ltd"
-    # name = module.naming.resources.s3.name
+    # name = "${local.project}.sandbox.adex.ltd"
+    name = module.naming.resources.s3.name
   }
+  s3force_destroy = var.s3force_destroy
+
+  domain_name = "${local.project}.sandbox.adex.ltd"
 }

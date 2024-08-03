@@ -46,6 +46,8 @@ def lambda_handler(event, context):
             response = save_post(json.loads(event['body']))
         elif http_method == 'GET':
             response = get_posts()
+        elif http_method == 'DELETE':
+            response = delete_post(post_id)
 
         return response
 

@@ -13,3 +13,11 @@ output "public_subnet_ids" {
 output "rds_identifier" {
   value = module.rds.db_instance_identifier
 }
+
+output "rds_proxy_identifier" {
+  value = module.rds_proxy.proxy_endpoint
+}
+
+output "s3bucket" {
+  value = module.s3_bucket.s3_bucket_id
+}
