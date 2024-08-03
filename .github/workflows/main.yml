@@ -54,7 +54,7 @@ jobs:
 
   upload-frontend:
     runs-on: ubuntu-latest
-    needs: infra_setup
+    needs: infra-terraform
 
     steps:
       - uses: actions/checkout@v4
