@@ -20,12 +20,9 @@ Parameters:
       - development
       - production
       - testing
-  # Prefix:
-  #   Type: String
-  #   Default: !Sub "${Project}-${Stage}"
-  VpcSG:
-    Type: CommaDelimitedList
-    Default: "sg-074f3b2bb01084cd9"
+  # VpcSG:
+  #   Type: CommaDelimitedList
+  #   Default: "sg-074f3b2bb01084cd9"
 
 
 Resources:
@@ -51,7 +48,8 @@ Resources:
             Resource: '*'
 
       VpcConfig:
-        SecurityGroupIds: !Ref VpcSG
+        SecurityGroupIds:
+          - sg-074f3b2bb01084cd9
         SubnetIds:
           - subnet-0e202abab09252c19
           - subnet-0b0603b1f01c4ef5d
