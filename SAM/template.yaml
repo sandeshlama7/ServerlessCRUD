@@ -1,7 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Transform:
-  - AWS::LanguageExtensions
-  - AWS::Serverless-2016-10-31
+Transform: AWS::Serverless-2016-10-31
+
 Description: "Creating the Services Resources for the Serverless Application"
 
 Globals:
@@ -114,3 +113,7 @@ Resources:
       EndpointConfiguration: REGIONAL
       Name: !Sub "${Project}-${Stage}-api"
       StageName: !Ref Stage
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'content-type'"
+        AllowOrigin: "'*'"
