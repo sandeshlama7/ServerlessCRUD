@@ -12,11 +12,7 @@ import Single from "./pages/Single";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./style.scss"
-import axios from "axios"
-
-const api = axios.create({
-  baseURL: process.env.API_BASE_URL,
-});
+import axios from "./axiosInstance";
 
 const Layout = () => {
   return (

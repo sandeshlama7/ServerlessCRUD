@@ -95,8 +95,8 @@ jobs:
 
       - name: Echo bucket name
         run: echo ${{env.S3BUCKET}}
-      - run: echo ${{env.PRIVATE_SUBNET_IDS}}
-      - run: echo ${{env.PUBLIC_SUBNET_IDS}}
+      - run: echo "VPC_SG=${{ env.VPC_SG }}, PRIVATE_SUBNET_IDS=${{ env.PRIVATE_SUBNET_IDS }}"
+
 
       - uses: actions/setup-node@v4
         with:
@@ -145,5 +145,5 @@ jobs:
         working-directory: ${{env.sam_dir}}
 
       - name: Deploy sam
-        run: sam deploy --config-file samconfig.toml --config-env ${{env.stage}} --parameter-overrides ParameterKey=VpcSG,ParameterValue=${{env.VPC_SG}} ParameterKey=PrivateSubnetIds,ParameterValue=${{env.PRIVATE_SUBNET_IDS}}
+        run: sam deploy --config-file samconfig.toml --config-env ${{env.stage}} --parameter-overrides ParameterKey=VpcSG,ParameterValue=${{env.VPC_SG}} ParameterKey=PrivateSubnetIds,ParameterValue="${{ env.PRIVATE_SUBNET_IDS }}"
         working-directory: ${{env.sam_dir}}
