@@ -8,6 +8,7 @@ engine              = "mysql"
 engine_version      = "8.0.35"
 db_instance_class   = "db.t3.micro"
 rds_storage         = 20
+rds_db = "blog"
 s3force_destroy     = true
 s3versioning        = false
 multi_az            = false
