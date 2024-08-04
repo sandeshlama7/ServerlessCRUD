@@ -1,7 +1,7 @@
 resource "aws_security_group" "rds_sg" {
   name        = module.naming.resources.sg.name
   description = "Security Group For The Private RDS"
-  vpc_id      = module.vpc.default_vpc_id
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     description     = "Allow Lambda Access to RDS"
