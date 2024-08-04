@@ -52,100 +52,101 @@ jobs:
 
       - name: Terraform destroy
         run: terraform destroy -var-file=${{env.tf_var_file}} -auto-approve
+        working-directory: ${{env.tf_dir}}
 
-  # upload-frontend:
-  #   runs-on: ubuntu-latest
-  #   needs: infra-terraform
+  upload-frontend:
+    runs-on: ubuntu-latest
+    needs: infra-terraform
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Install awscli
-  #       run: sudo snap install aws-cli --classic
+      - name: Install awscli
+        run: sudo snap install aws-cli --classic
 
-  #     - name: export AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-  #         aws-region: ${{env.region}}
+      - name: export AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{env.region}}
 
-  #     - name: Add the necessary values in respective env variables
-  #       uses: mathiasvr/command-output@v2.0.0
-  #       id: get-resources
-  #       with:
-  #         run: |
-  #           state_file_name=$backend_key
-  #           aws s3 cp s3://$backend_bucket/$backend_key $state_file_name
-  #           vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
-  #           private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value | join(",")')
-  #           public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value | join(",")')
-  #           rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
-  #           s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
-  #           vpc_sg=$(terraform output --json -state=$state_file_name | jq -r '.vpc_sg.value')
-
-
-  #           echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
-  #           echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
-  #           echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
-  #           echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
-  #           echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
-  #           echo "VPC_SG=$vpc_sg" >> "$GITHUB_ENV"
-
-  #     - name: Echo bucket name
-  #       run: echo ${{env.S3BUCKET}}
-  #     - run: echo "VPC_SG=${{ env.VPC_SG }}, PRIVATE_SUBNET_IDS=${{ env.PRIVATE_SUBNET_IDS }}"
+      - name: Add the necessary values in respective env variables
+        uses: mathiasvr/command-output@v2.0.0
+        id: get-resources
+        with:
+          run: |
+            state_file_name=$backend_key
+            aws s3 cp s3://$backend_bucket/$backend_key $state_file_name
+            vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
+            private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value | join(",")')
+            public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value | join(",")')
+            rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
+            s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
+            vpc_sg=$(terraform output --json -state=$state_file_name | jq -r '.vpc_sg.value')
 
 
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 20
-  #     # - run: npm ci
-  #     # - run: npm test
+            echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
+            echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
+            echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
+            echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
+            echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
+            echo "VPC_SG=$vpc_sg" >> "$GITHUB_ENV"
 
-  #     - name: Install react dependencies
-  #       run: npm install
-  #       working-directory: client
+      - name: Echo bucket name
+        run: echo ${{env.S3BUCKET}}
+      - run: echo "VPC_SG=${{ env.VPC_SG }}, PRIVATE_SUBNET_IDS=${{ env.PRIVATE_SUBNET_IDS }}"
 
-  #     - name: build react app
-  #       run: npm run build
-  #       working-directory: client
-  #       env:
-  #         CI: false
 
-  #     - name: Upload the built frontend to S3
-  #       run: aws s3 cp client/build/ s3://$S3BUCKET/ --recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # - run: npm ci
+      # - run: npm test
 
-  # infra-sam:
-  #   runs-on: ubuntu-latest
-  #   needs:
-  #     - upload-frontend
+      - name: Install react dependencies
+        run: npm install
+        working-directory: client
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+      - name: build react app
+        run: npm run build
+        working-directory: client
+        env:
+          CI: false
 
-  #     - name: AWS Creds
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-  #         aws-region: us-east-1
+      - name: Upload the built frontend to S3
+        run: aws s3 cp client/build/ s3://$S3BUCKET/ --recursive
 
-  #     - name: Install sam cli and cloudformation linter
-  #       run: pip install aws-sam-cli cfn-lint cfn-lint-serverless
+  infra-sam:
+    runs-on: ubuntu-latest
+    needs:
+      - upload-frontend
 
-  #     # - name: lint sam
-  #     #   run: sam validate & cfn-lint template.yml -a cfn_lint_serverless.rules
-  #     #   working-directory: ${{env.sam_dir}}
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Package sam
-  #       run: sam package --s3-bucket ${{ env.backend_bucket }}
-  #       working-directory: ${{env.sam_dir}}
+      - name: AWS Creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
 
-  #     - run: echo ${{env.PRIVATE_SUBNET_IDS}}
+      - name: Install sam cli and cloudformation linter
+        run: pip install aws-sam-cli cfn-lint cfn-lint-serverless
 
-  #     - name: Deploy sam
-  #       run: sam deploy --config-file samconfig.toml --config-env ${{env.stage}} --parameter-overrides ParameterKey=VpcSG,ParameterValue=${{env.VPC_SG}} ParameterKey=PrivateSubnetIds,ParameterValue=${{ env.PRIVATE_SUBNET_IDS }}
-  #       working-directory: ${{env.sam_dir}}
+      # - name: lint sam
+      #   run: sam validate & cfn-lint template.yml -a cfn_lint_serverless.rules
+      #   working-directory: ${{env.sam_dir}}
+
+      - name: Package sam
+        run: sam package --s3-bucket ${{ env.backend_bucket }}
+        working-directory: ${{env.sam_dir}}
+
+      - run: echo ${{env.PRIVATE_SUBNET_IDS}}
+
+      - name: Deploy sam
+        run: sam deploy --config-file samconfig.toml --config-env ${{env.stage}} --parameter-overrides ParameterKey=VpcSG,ParameterValue=${{env.VPC_SG}} ParameterKey=PrivateSubnetIds,ParameterValue=${{ env.PRIVATE_SUBNET_IDS }}
+        working-directory: ${{env.sam_dir}}
