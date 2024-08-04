@@ -21,7 +21,7 @@ module "rds" {
 
   # Enhanced Monitoring
   monitoring_interval    = "30"
-  monitoring_role_name   = "RDSMonitoringRole"
+  monitoring_role_name   = "${local.rds_identifier}-MonitoringRole"
   create_monitoring_role = true
 
   # DB subnet group
@@ -37,6 +37,6 @@ module "rds" {
   # major_engine_version = "8.0"
 
   # Database Deletion Protection
-  #   deletion_protection = local.deletion_protection 
+  #   deletion_protection = local.deletion_protection
 
 }
