@@ -5,11 +5,11 @@ module "cdn" {
 
   comment             = "LamaBlog CloudFront"
   enabled             = true
-  price_class         = "PriceClass_All"
+  price_class         = local.price_class
   retain_on_delete    = false
   wait_for_deployment = false
 
-  default_root_object = "index.html"
+  default_root_object = local.default_root_object
 
   create_origin_access_control = true
   origin_access_control = {
@@ -20,7 +20,6 @@ module "cdn" {
       signing_protocol = "sigv4"
     }
   }
-
 
   origin = {
     s3static = {
@@ -38,7 +37,6 @@ module "cdn" {
     compress               = true
     query_string           = true
     viewer_protocol_policy = "redirect-to-https"
-
   }
 
   viewer_certificate = {

@@ -72,13 +72,35 @@ variable "rds_storage" {
   description = "The amount of Storage for RDS in GiB"
   type        = number
 }
+variable "multi_az" {
+  description = "Whether to create a multi AZ RDS or not"
+  type        = bool
+}
+variable "rds_db" {
+  description = "The name of the database inside the RDS instance"
+  type        = string
+}
+variable "rds_username" {
+  description = "The master username for RDS"
+  type        = string
+}
+variable "rds_port" {
+  description = "The port for RDS database"
+  type        = string
+  default     = "3306"
+}
+variable "deletion_protection" {
+  type = bool
+}
 
-# variable "proxy_name" {
-#   description = "The name for the RDS Proxy"
-#   type = string
-# }
-
-# variable "proxy_role" {
-#   description = "The name of the IAM Role for the RDS Proxy"
-#   type = string
-# }
+#######################
+# Cloudfront
+#######################
+variable "price_class" {
+  description = "The distribution scale: Whole World, Major Continents, Few Countries?"
+  type        = string
+}
+variable "default_root_object" {
+  description = "The default root object that the cloudfront fetches the content from"
+  type        = string
+}

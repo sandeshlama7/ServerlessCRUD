@@ -5,7 +5,6 @@ locals {
 
   ###### VPC
   vpc = {
-    # name = "${local.prefix}-vpc"
     name = module.naming.resources.vpc.name
     cidr = var.vpc_cidr
     azs  = slice(data.aws_availability_zones.available.names, 0, var.number_of_azs)
@@ -18,22 +17,32 @@ locals {
   environment   = var.environment
 
   ###### RDS
-  # rds_identifier    = "${local.prefix}-db"
   rds_identifier    = module.naming.resources.rds.name
   engine            = var.engine
   engine_version    = var.engine_version
   db_instance_class = var.db_instance_class
   rds_storage       = var.rds_storage
-  proxy_name        = "${local.rds_identifier}-proxy"
-  proxy_role        = "${local.proxy_name}-role"
+  multi_az          = var.multi_az
+  rds_db            = var.rds_db
+  rds_username      = var.rds_username
+  rds_port          = var.rds_port
+
+  proxy_name = "${local.rds_identifier}-proxy"
+  proxy_role = "${local.proxy_name}-role"
+
+  deletion_protection = var.deletion_protection
 
   #### S3
   frontend_bucket = {
-    # name = "${local.project}.sandbox.adex.ltd"
     name = module.naming.resources.s3.name
   }
   s3force_destroy = var.s3force_destroy
   s3versioning    = var.s3versioning
 
   domain_name = "${local.project}.sandbox.adex.ltd"
+
+  #### Cloudfront
+  price_class         = var.price_class
+  default_root_object = var.default_root_object
+
 }
