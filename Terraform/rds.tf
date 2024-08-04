@@ -36,6 +36,8 @@ module "rds" {
   create_db_option_group = false
   # major_engine_version = "8.0"
 
+  skip_final_snapshot = true
+
   # Database Deletion Protection
   #   deletion_protection = local.deletion_protection
 
