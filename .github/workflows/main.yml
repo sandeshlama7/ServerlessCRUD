@@ -117,30 +117,30 @@ jobs:
       - name: Upload the built frontend to S3
         run: aws s3 cp client/build/ s3://$S3BUCKET/ --recursive
 
-  # infra-sam:
-  #   runs-on: ubuntu-latest
-  #   needs:
-  #     - upload-frontend
+  infra-sam:
+    runs-on: ubuntu-latest
+    needs:
+      - upload-frontend
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: AWS Creds
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-  #         aws-region: us-east-1
+      - name: AWS Creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
 
-  #     - name: Install sam cli and cloudformation linter
-  #       run: pip install aws-sam-cli cfn-lint cfn-lint-serverless
+      - name: Install sam cli and cloudformation linter
+        run: pip install aws-sam-cli cfn-lint cfn-lint-serverless
 
-  #     - name: lint sam
-  #       run: sam validate & cfn-lint template.yml -a cfn_lint_serverless.rules
+      - name: lint sam
+        run: sam validate & cfn-lint template.yml -a cfn_lint_serverless.rules
 
-  #     - name: Package sam
-  #       run: sam package --s3-bucket ${{ env.backend-bucket }}
+      - name: Package sam
+        run: sam package --s3-bucket ${{ env.backend-bucket }}
 
-  #     - name: Deploy sam
-  #       run: sam deploy --config-file samconfig.toml --config-env $stage --parameter-overrides VpcSG=${{env.VPC_SG}} PrivateSubnetIds=${{env.PRIVATE_SUBNET_IDS}}
+      - name: Deploy sam
+        run: sam deploy --config-file samconfig.toml --config-env $stage --parameter-overrides VpcSG=${{env.VPC_SG}} PrivateSubnetIds=${{env.PRIVATE_SUBNET_IDS}}
