@@ -141,7 +141,7 @@ jobs:
       #   working-directory: ${{env.sam_dir}}
 
       - name: Package sam
-        run: sam package --s3-bucket ${{ env.backend-bucket }}
+        run: sam package --s3-bucket ${{ env.backend_bucket }}
         working-directory: ${{env.sam_dir}}
 
       - name: Deploy sam
