@@ -21,10 +21,11 @@ Parameters:
       - development
       - production
       - testing
-  # VpcSG:
-  #   Type: CommaDelimitedList
-  #   Default: "sg-074f3b2bb01084cd9"
-
+  VpcSG:
+    Type: CommaDelimitedList
+    Default: ["sg-074f3b2bb01084cd9"]
+  PrivateSubnetIds:
+    Type: CommaDelimitedList
 
 Resources:
   BackendFunction:
@@ -47,12 +48,9 @@ Resources:
             Action:
             - rds-db:connect
             Resource: '*'
-      # VpcConfig:
-      #   SecurityGroupIds:
-      #     - sg-074f3b2bb01084cd9
-      #   SubnetIds:
-      #     - subnet-0e202abab09252c19
-      #     - subnet-0b0603b1f01c4ef5d
+      VpcConfig:
+        SecurityGroupIds: !Ref VpcSG
+      SubnetIds: !Ref PrivateSubnetIds
       Environment:
         Variables:
           DB_NAME: "blog"

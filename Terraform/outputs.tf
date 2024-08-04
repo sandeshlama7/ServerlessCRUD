@@ -21,3 +21,7 @@ output "rds_proxy_identifier" {
 output "s3bucket" {
   value = module.s3_bucket.s3_bucket_id
 }
+
+output "vpc_sg" {
+  value = module.vpc.default_security_group_id
+}
