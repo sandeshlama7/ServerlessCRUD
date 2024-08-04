@@ -75,22 +75,22 @@ jobs:
         uses: mathiasvr/command-output@v2.0.0
         id: get-resources
         with:
-            # private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value')
             # public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value')
           run: |
             state_file_name=$backend_key
             aws s3 cp s3://$backend_bucket/$backend_key $state_file_name
             vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
+            private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value')
             rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
             s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
 
+            echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
             echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
             echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
             echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
 
       - name: Echo bucket name
         run: echo ${{env.S3BUCKET}}
-            # echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
             # echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
 
       - uses: actions/setup-node@v4
@@ -128,8 +128,8 @@ jobs:
   #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
   #         aws-region: us-east-1
 
-  #     - name: Install sam cli
-  #       run: pip install aws-sam-cli
+  #     - name: Install sam cli and cloudformation linter
+  #       run: pip install aws-sam-cli cfn-lint cfn-lint-serverless
 
   #     - name: lint sam
   #       run: sam validate & cfn-lint template.yml -a cfn_lint_serverless.rules
