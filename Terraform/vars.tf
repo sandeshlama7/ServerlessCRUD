@@ -6,7 +6,7 @@ variable "region" {
 
 variable "naming_prefix" {
   description = "The prefix required for the naming module"
-  type = string
+  type        = string
 }
 
 ########################
@@ -45,6 +45,10 @@ variable "number_of_azs" {
 ########################
 variable "s3force_destroy" {
   description = "Whether to force destroy the bucket"
+  type        = bool
+}
+variable "s3versioning" {
+  description = "Enable/Disable S3 versioning"
   type        = bool
 }
 

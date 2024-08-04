@@ -9,7 +9,7 @@ module "records" {
       name = local.project
       type = "A"
       alias = {
-        name    = module.cdn.cloudfront_distribution_domain_name
+        name = module.cdn.cloudfront_distribution_domain_name
         # zone_id = data.aws_route53_zone.r53zone.zone_id
         zone_id = module.cdn.cloudfront_distribution_hosted_zone_id
       }

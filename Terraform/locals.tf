@@ -1,6 +1,6 @@
 locals {
-  region = var.region
-  prefix = "${var.project}-${var.environment}"
+  region        = var.region
+  prefix        = "${var.project}-${var.environment}"
   naming_prefix = var.naming_prefix
 
   ###### VPC
@@ -33,6 +33,7 @@ locals {
     name = module.naming.resources.s3.name
   }
   s3force_destroy = var.s3force_destroy
+  s3versioning    = var.s3versioning
 
   domain_name = "${local.project}.sandbox.adex.ltd"
 }

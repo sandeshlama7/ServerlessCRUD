@@ -1,11 +1,12 @@
 vpc_cidr          = "10.0.16.0/24"
 project           = "lamablog"
 project_short     = "lb"
-naming_prefix = "app"
+naming_prefix     = "app"
 environment       = "production"
 number_of_azs     = 2
 engine            = "mysql"
 engine_version    = "8.0.35"
 db_instance_class = "db.t3.micro"
 rds_storage       = 20
-s3force_destroy = false
+s3force_destroy   = false
+s3versioning      = true

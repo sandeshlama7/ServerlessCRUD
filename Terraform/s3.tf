@@ -13,18 +13,22 @@ module "s3_bucket" {
     error_document : "index.html"
   }
 
+  versioning = {
+    enabled = local.s3versioning
+  }
+
   force_destroy = local.s3force_destroy
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect    = "Allow"
+        Effect = "Allow"
         Principal = {
-          Service: "cloudfront.amazonaws.com"
+          Service : "cloudfront.amazonaws.com"
         }
-        Action    = "s3:GetObject"
-        Resource  = "arn:aws:s3:::${local.frontend_bucket.name}/*"
+        Action   = "s3:GetObject"
+        Resource = "arn:aws:s3:::${local.frontend_bucket.name}/*"
         # "Condition" = {
         #   "StringEquals": {
         #     "AWS:SourceArn": module.cdn.arn

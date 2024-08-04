@@ -1,7 +1,7 @@
 module "cdn" {
   source = "terraform-aws-modules/cloudfront/aws"
 
-    aliases = [local.domain_name]
+  aliases = [local.domain_name]
 
   comment             = "LamaBlog CloudFront"
   enabled             = true
@@ -11,7 +11,7 @@ module "cdn" {
 
   default_root_object = "index.html"
 
-create_origin_access_control = true
+  create_origin_access_control = true
   origin_access_control = {
     s3_oac = {
       description      = "CloudFront access to S3"
@@ -24,19 +24,19 @@ create_origin_access_control = true
 
   origin = {
     s3static = {
-      domain_name = module.s3_bucket.s3_bucket_bucket_domain_name
-        origin_access_control = "s3_oac"
-  }
+      domain_name           = module.s3_bucket.s3_bucket_bucket_domain_name
+      origin_access_control = "s3_oac"
+    }
   }
 
   default_cache_behavior = {
     target_origin_id       = "s3static"
     viewer_protocol_policy = "allow-all"
 
-    allowed_methods = ["GET", "HEAD", "OPTIONS"]
-    cached_methods  = ["GET", "HEAD"]
-    compress        = true
-    query_string    = true
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
+    query_string           = true
     viewer_protocol_policy = "redirect-to-https"
 
   }

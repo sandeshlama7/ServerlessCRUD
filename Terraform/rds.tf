@@ -36,7 +36,7 @@ module "rds" {
   create_db_option_group = false
   # major_engine_version = "8.0"
 
-    # Database Deletion Protection
+  # Database Deletion Protection
   #   deletion_protection = true
 
 }

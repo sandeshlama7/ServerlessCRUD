@@ -50,7 +50,7 @@ Resources:
             Resource: '*'
       VpcConfig:
         SecurityGroupIds: !Ref VpcSG
-      SubnetIds: !Ref PrivateSubnetIds
+        SubnetIds: !Ref PrivateSubnetIds
       Environment:
         Variables:
           DB_NAME: "blog"
