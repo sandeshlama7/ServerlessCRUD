@@ -13,7 +13,7 @@ env:
   sam_dir: SAM
   stage: production
   backend_bucket: "8586-terraform-state"
-  backend_key: "${{env.stage}}/terraform.tfstate"
+  backend_key: "${{ env.stage }}/terraform.tfstate"
   region: "us-east-1"
   tf_var_file: prod.tfvars
 
