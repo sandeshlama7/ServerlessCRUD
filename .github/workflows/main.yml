@@ -80,7 +80,7 @@ jobs:
             state_file_name=$backend_key
             aws s3 cp s3://$backend_bucket/$backend_key $state_file_name
             vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
-            private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value')
+            private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value | join(",")')
             rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
             s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
 
