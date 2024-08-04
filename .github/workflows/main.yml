@@ -80,7 +80,9 @@ jobs:
             # rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
         with:
           run: |
+            echo $backend-key
             state_file_name=$backend-key
+            echo $state_file_name
             aws s3 cp s3://$backend-bucket/$state_file_name $state_file_name
             s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
 
