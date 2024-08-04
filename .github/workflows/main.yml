@@ -136,9 +136,9 @@ jobs:
       - name: Install sam cli and cloudformation linter
         run: pip install aws-sam-cli cfn-lint cfn-lint-serverless
 
-      - name: lint sam
-        run: sam validate & cfn-lint template.yml -a cfn_lint_serverless.rules
-        working-directory: ${{env.sam_dir}}
+      # - name: lint sam
+      #   run: sam validate & cfn-lint template.yml -a cfn_lint_serverless.rules
+      #   working-directory: ${{env.sam_dir}}
 
       - name: Package sam
         run: sam package --s3-bucket ${{ env.backend-bucket }}

@@ -23,7 +23,7 @@ Parameters:
       - testing
   VpcSG:
     Type: CommaDelimitedList
-    Default: ["sg-074f3b2bb01084cd9"]
+    Default: "sg-074f3b2bb01084cd9"
   PrivateSubnetIds:
     Type: CommaDelimitedList
 
