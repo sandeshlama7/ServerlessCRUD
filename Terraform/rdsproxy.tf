@@ -7,7 +7,7 @@ module "rds_proxy" {
   vpc_security_group_ids = [module.vpc.default_security_group_id,aws_security_group.rds_sg.id]
 
   auth = {
-    local.rds_db = {
+    "${local.rds_db}" = {
       description = "RDS MySQL admin password"
       secret_arn  = module.rds.db_instance_master_user_secret_arn
     }
