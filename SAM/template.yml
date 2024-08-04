@@ -47,12 +47,12 @@ Resources:
             Action:
             - rds-db:connect
             Resource: '*'
-      VpcConfig:
-        SecurityGroupIds:
-          - sg-074f3b2bb01084cd9
-        SubnetIds:
-          - subnet-0e202abab09252c19
-          - subnet-0b0603b1f01c4ef5d
+      # VpcConfig:
+      #   SecurityGroupIds:
+      #     - sg-074f3b2bb01084cd9
+      #   SubnetIds:
+      #     - subnet-0e202abab09252c19
+      #     - subnet-0b0603b1f01c4ef5d
       Environment:
         Variables:
           DB_NAME: "blog"
