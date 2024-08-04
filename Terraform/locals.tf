@@ -39,7 +39,8 @@ locals {
   s3force_destroy = var.s3force_destroy
   s3versioning    = var.s3versioning
 
-  domain_name = "${local.project}.sandbox.adex.ltd"
+  domain_name = "${local.project}.${local.environment}.sandbox.adex.ltd"
+  # domain_name = "${local.project}.sandbox.adex.ltd"
 
   #### Cloudfront
   price_class         = var.price_class

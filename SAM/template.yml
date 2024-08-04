@@ -23,9 +23,11 @@ Parameters:
       - testing
   VpcSG:
     Type: CommaDelimitedList
+    # Type: 'List<AWS::EC2::SecurityGroup::Id>'
     Default: "sg-074f3b2bb01084cd9"
   PrivateSubnetIds:
     Type: CommaDelimitedList
+    # Type: 'List<AWS::EC2::Subnet:id>'
 
 Resources:
   BackendFunction:

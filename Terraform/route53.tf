@@ -6,7 +6,7 @@ module "records" {
 
   records = [
     {
-      name = local.project
+      name = "${local.project}.${local.environment}"
       type = "A"
       alias = {
         name = module.cdn.cloudfront_distribution_domain_name
