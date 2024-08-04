@@ -138,9 +138,12 @@ jobs:
 
       - name: lint sam
         run: sam validate & cfn-lint template.yml -a cfn_lint_serverless.rules
+        working-directory: ${{env.sam_dir}}
 
       - name: Package sam
         run: sam package --s3-bucket ${{ env.backend-bucket }}
+        working-directory: ${{env.sam_dir}}
 
       - name: Deploy sam
         run: sam deploy --config-file samconfig.toml --config-env $stage --parameter-overrides VpcSG=${{env.VPC_SG}} PrivateSubnetIds=${{env.PRIVATE_SUBNET_IDS}}
+        working-directory: ${{env.sam_dir}}
