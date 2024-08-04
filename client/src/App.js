@@ -15,7 +15,7 @@ import "./style.scss"
 import axios from "axios"
 
 const api = axios.create({
-  baseURL: 'https://gxylwcy0x7.execute-api.us-east-1.amazonaws.com/development',  // Replace with your API Gateway endpoint
+  baseURL: process.env.API_BASE_URL,
 });
 
 const Layout = () => {
