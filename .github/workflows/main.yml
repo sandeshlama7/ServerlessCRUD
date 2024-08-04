@@ -63,9 +63,6 @@ jobs:
       - name: Install awscli
         run: sudo snap install aws-cli --classic
 
-      - name: Check vars
-        run: echo $backend_key
-
       - name: export AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -99,7 +96,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
+      # - run: npm ci
       - run: npm test
 
       - name: Install react dependencies
