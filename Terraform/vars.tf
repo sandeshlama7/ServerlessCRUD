@@ -83,6 +83,7 @@ variable "rds_db" {
 variable "rds_username" {
   description = "The master username for RDS"
   type        = string
+  default = "admin"
 }
 variable "rds_port" {
   description = "The port for RDS database"
