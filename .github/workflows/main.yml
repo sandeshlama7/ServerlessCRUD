@@ -12,10 +12,10 @@ env:
   tf_dir: Terraform
   sam_dir: SAM
   stage: production
-  backend-bucket: "8586-terraform-state"
-  backend-key: "$stage/terraform.tfstate"
+  backend_bucket: "8586-terraform-state"
+  backend_key: "${{env.stage}}/terraform.tfstate"
   region: "us-east-1"
-  tf-var-file: prod.tfvars
+  tf_var_file: prod.tfvars
 
 jobs:
   infra-terraform:
@@ -39,7 +39,7 @@ jobs:
           aws-region: ${{ env.region }}
 
       - name: Terraform Init
-        run: terraform init  -backend-config="bucket=${{env.backend-bucket}}" -backend-config="key=${{env.backend-key}}" -backend-config="region=${{env.region}}"
+        run: terraform init  -backend-config="bucket=${{env.backend_bucket}}" -backend-config="key=${{env.backend_key}}" -backend-config="region=${{env.region}}"
         working-directory: ${{env.tf_dir}}
 
       - name: Validate terraform
@@ -47,71 +47,69 @@ jobs:
         working-directory: ${{env.tf_dir}}
 
       - name: Terraform apply
-        run: terraform apply -var-file=${{env.tf-var-file}} -auto-approve
+        run: terraform apply -var-file=${{env.tf_var_file}} -auto-approve
         working-directory: ${{env.tf_dir}}
 
-      - name: Echo vars
-        run: |
-          echo $backend-bucket
-          echo $backend-key
-
       # - name: Terraform destroy
-      #   run: terraform destroy -var-file=${{env.tf-var-file}} -auto-approve
+      #   run: terraform destroy -var-file=${{env.tf_var_file}} -auto-approve
 
-  # upload-frontend:
-  #   runs-on: ubuntu-latest
-  #   needs: infra-terraform
+  upload-frontend:
+    runs-on: ubuntu-latest
+    needs: infra-terraform
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Install awscli
-  #       run: sudo snap install aws-cli --classic
+      - name: Install awscli
+        run: sudo snap install aws-cli --classic
 
-  #     - name: export AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-  #         aws-region: ${{env.region}}
+      - name: Check vars
+        run: echo $backend_key
 
-  #     - name: Add the necessary values in respective env variables
-  #       uses: mathiasvr/command-output@v2.0.0
-  #       id: get-resources
-  #           # vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
-  #           # private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value')
-  #           # public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value')
-  #           # rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
-  #       with:
-  #         run: |
-  #           state_file_name=$backend-key
-  #           aws s3 cp s3://$backend-bucket/$backend-key $state_file_name
-  #           s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
+      - name: export AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{env.region}}
 
-  #           echo "S3BUCKET=$s3bucket" >> "GITHUB_ENV"
+      - name: Add the necessary values in respective env variables
+        uses: mathiasvr/command-output@v2.0.0
+        id: get-resources
+            # vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
+            # private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value')
+            # public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value')
+            # rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
+        with:
+          run: |
+            state_file_name=$backend_key
+            aws s3 cp s3://$backend_bucket/$backend_key $state_file_name
+            s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
 
-  #     - name: Echo bucket name
-  #       run: echo ${{env.S3BUCKET}}
-  #           # echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
-  #           # echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
-  #           # echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
-  #           # echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
+            echo "S3BUCKET=$s3bucket" >> "GITHUB_ENV"
 
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 18
+      - name: Echo bucket name
+        run: echo ${{env.S3BUCKET}}
+            # echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
+            # echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
+            # echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
+            # echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
 
-  #     - name: Install react dependencies
-  #       run: npm install
-  #       working-directory: client
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-  #     - name: build react app
-  #       run: npm run build
-  #       working-directory: client
+      - name: Install react dependencies
+        run: npm install
+        working-directory: client
 
-  #     - name: Upload the built frontend to S3
-  #       run: aws s3 cp client/build/ s3://$S3BUCKET/ --recursive
+      - name: build react app
+        run: npm run build
+        working-directory: client
+
+      - name: Upload the built frontend to S3
+        run: aws s3 cp client/build/ s3://$S3BUCKET/ --recursive
 
   # infra-sam:
   #   runs-on: ubuntu-latest
