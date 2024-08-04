@@ -1,7 +1,7 @@
 version = 0.1
 [development.deploy.parameters]
 stack_name = "lamablog-development-stack"
-s3_bucket = "8586-terraform-state"
+s3_bucket = 8586-terraform-state
 s3_prefix = "lamablog-development"
 region = "us-east-1"
 confirm_changeset = false
@@ -11,7 +11,7 @@ parameter_overrides = "Stage=\"development\""
 
 [production.deploy.parameters]
 stack_name = "lamablog-production-stack"
-s3_bucket = "8586-terraform-state"
+s3_bucket = 8586-terraform-state
 s3_prefix = "lamablog-production"
 region = "us-east-1"
 confirm_changeset = false

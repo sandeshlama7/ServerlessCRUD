@@ -11,8 +11,9 @@ on:
 env:
   tf_dir: Terraform
   sam_dir: SAM
+  stage: production
   backend-bucket: "8586-terraform-state"
-  backend-key: "production/terraform.tfstate"
+  backend-key: "$stage/terraform.tfstate"
   region: "us-east-1"
   tf-var-file: prod.tfvars
 
@@ -73,21 +74,24 @@ jobs:
       - name: Add the necessary values in respective env variables
         uses: mathiasvr/command-output@v2.0.0
         id: get-resources
+            # vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
+            # private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value')
+            # public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value')
+            # rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
         with:
           run: |
             state_file_name=$backend-key
             aws s3 cp s3://$backend-bucket/$state_file_name $state_file_name
-            vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
-            private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value')
-            public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value')
-            rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
             s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
 
-            echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
-            echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
-            echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
-            echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
             echo "S3BUCKET=$s3bucket" >> "GITHUB_ENV"
+
+      - name: Echo bucket name
+        run: echo ${{env.S3BUCKET}}
+            # echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
+            # echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
+            # echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
+            # echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
 
       - uses: actions/setup-node@v4
         with:
@@ -130,4 +134,4 @@ jobs:
   #       run: sam package --s3-bucket ${{ env.backend-bucket }}
 
   #     - name: Deploy sam
-  #       run: sam deploy --config-file samconfig.toml --config-env production
+  #       run: sam deploy --config-file samconfig.toml --config-env $stage
