@@ -14,7 +14,7 @@ module "rds" {
   username = local.rds_username
   port     = local.rds_port
 
-  vpc_security_group_ids = [module.vpc.default_security_group_id, aws_security_group.rds_sg.id]
+  vpc_security_group_ids = [module.vpc.default_security_group_id, module.db_security_group.security_group_id]
 
   maintenance_window = "Mon:00:00-Mon:03:00"
   backup_window      = "03:00-06:00"

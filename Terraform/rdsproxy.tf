@@ -4,7 +4,7 @@ module "rds_proxy" {
   name                   = local.proxy_name
   iam_role_name          = local.proxy_role
   vpc_subnet_ids         = module.vpc.private_subnets
-  vpc_security_group_ids = [module.vpc.default_security_group_id,aws_security_group.rds_sg.id]
+  vpc_security_group_ids = [module.vpc.default_security_group_id, module.db_security_group.security_group_id]
 
   auth = {
     "${local.rds_db}" = {
