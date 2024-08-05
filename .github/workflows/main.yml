@@ -157,5 +157,5 @@ jobs:
         working-directory: ${{env.sam_dir}}
 
       - name: Deploy sam
-        run: sam deploy --config-file samconfig.toml --config-env ${{env.stage}} --parameter-overrides ParameterKey=VpcSG,ParameterValue=${{env.VPC_SG}} ParameterKey=PrivateSubnetIds,ParameterValue=${{ env.PRIVATE_SUBNET_IDS }}
+        run: sam deploy --config-file samconfig.toml --config-env ${{env.stage}} --parameter-overrides VpcSG=${{env.VPC_SG}} PrivateSubnetIds=${{ env.PRIVATE_SUBNET_IDS }} Stage=${{env.stage}}
         working-directory: ${{env.sam_dir}}
