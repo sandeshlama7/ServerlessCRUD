@@ -56,12 +56,12 @@ Resources:
             Resource: '*'
       VpcConfig:
         SecurityGroupIds:
-          # - Ref: VpcSG
-          - sg-03df20d6d58be3b3a
+          - Ref: VpcSG
+          # - sg-0a22c44730333ba85
         SubnetIds:
-          # - Ref: PrivateSubnetIds
-          - subnet-0605e6a6661666c06
-          - subnet-092b470dba1fe0cf5
+          - Ref: PrivateSubnetIds
+          # - subnet-02569b7b31a687ca3
+          # - subnet-043079b0d9d03633a
       Environment:
         Variables:
           DB_NAME: "blog"

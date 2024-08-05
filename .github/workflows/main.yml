@@ -79,25 +79,12 @@ jobs:
           run: |
             state_file_name=$backend_key
             aws s3 cp s3://$backend_bucket/$backend_key $state_file_name
-            vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
-            private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value | join(",")')
-            public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value | join(",")')
-            rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
             s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
-            vpc_sg=$(terraform output --json -state=$state_file_name | jq -r '.vpc_sg.value')
 
-
-            echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
-            echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
-            echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
-            echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
             echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
-            echo "VPC_SG=$vpc_sg" >> "$GITHUB_ENV"
 
       - name: Echo bucket name
         run: echo ${{env.S3BUCKET}}
-      - run: echo "VPC_SG=${{ env.VPC_SG }}, PRIVATE_SUBNET_IDS=${{ env.PRIVATE_SUBNET_IDS }}"
-
 
       - uses: actions/setup-node@v4
         with:
@@ -169,8 +156,6 @@ jobs:
         run: sam package --s3-bucket ${{ env.backend_bucket }}
         working-directory: ${{env.sam_dir}}
 
-
-
-      # - name: Deploy sam
-      #   run: sam deploy --config-file samconfig.toml --config-env ${{env.stage}} --parameter-overrides ParameterKey=VpcSG,ParameterValue=${{env.VPC_SG}} ParameterKey=PrivateSubnetIds,ParameterValue=${{ env.PRIVATE_SUBNET_IDS }}
-      #   working-directory: ${{env.sam_dir}}
+      - name: Deploy sam
+        run: sam deploy --config-file samconfig.toml --config-env ${{env.stage}} --parameter-overrides ParameterKey=VpcSG,ParameterValue=${{env.VPC_SG}} ParameterKey=PrivateSubnetIds,ParameterValue=${{ env.PRIVATE_SUBNET_IDS }}
+        working-directory: ${{env.sam_dir}}
