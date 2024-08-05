@@ -55,11 +55,9 @@ Resources:
             - rds-db:connect
             Resource: '*'
       VpcConfig:
-        SecurityGroupIds:
-          - Ref: VpcSG
+        SecurityGroupIds: !Ref VpcSG
           # - sg-0a22c44730333ba85
-        SubnetIds:
-          - Ref: PrivateSubnetIds
+        SubnetIds: !Ref PrivateSubnetIds
           # - subnet-02569b7b31a687ca3
           # - subnet-043079b0d9d03633a
       Environment:
