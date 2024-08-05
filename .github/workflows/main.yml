@@ -141,11 +141,34 @@ jobs:
       #   run: sam validate & cfn-lint template.yml -a cfn_lint_serverless.rules
       #   working-directory: ${{env.sam_dir}}
 
+      - name: Add the necessary values in respective env variables
+        uses: mathiasvr/command-output@v2.0.0
+        id: get-resources
+        with:
+          run: |
+            state_file_name=$backend_key
+            aws s3 cp s3://$backend_bucket/$backend_key $state_file_name
+            vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
+            private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value | join(",")')
+            public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value | join(",")')
+            rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
+            s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
+            vpc_sg=$(terraform output --json -state=$state_file_name | jq -r '.vpc_sg.value')
+
+
+            echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
+            echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
+            echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
+            echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
+            echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
+            echo "VPC_SG=$vpc_sg" >> "$GITHUB_ENV"
+
+      - run: echo "VPC_SG=${{ env.VPC_SG }}, PRIVATE_SUBNET_IDS=${{ env.PRIVATE_SUBNET_IDS }}"
+
       - name: Package sam
         run: sam package --s3-bucket ${{ env.backend_bucket }}
         working-directory: ${{env.sam_dir}}
 
-      - run: echo "VPC_SG=${{ env.VPC_SG }}, PRIVATE_SUBNET_IDS=${{ env.PRIVATE_SUBNET_IDS }}"
 
 
       # - name: Deploy sam
