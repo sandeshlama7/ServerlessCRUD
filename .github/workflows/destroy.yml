@@ -1,0 +1,52 @@
+# name: Infrastructure setup
+
+# run-name: ${{ github.actor }} is provisioning the infra
+
+# on:
+#   push:
+#     branches: [ "infra", "main" ]
+
+# env:
+#   tf_dir: Terraform
+#   sam_dir: SAM
+#   stage: production
+#   backend_bucket: "8586-terraform-state"
+#   backend_key: "production/terraform.tfstate"
+#   region: "us-east-1"
+#   tf_var_file: prod.tfvars
+
+# jobs:
+#   infra-terraform:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout Git Repo
+#         uses: actions/checkout@v4
+
+#       - name: Install Terraform on Runner
+#         uses: hashicorp/setup-terraform@v3
+#         with:
+#           terraform_wrapper: false
+
+#       - name: Install sam cli
+#         run: pip install aws-sam-cli
+
+#       - name: export AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+#           aws-region: ${{ env.region }}
+
+#       - name: Terraform Init
+#         run: terraform init  -backend-config="bucket=${{env.backend_bucket}}" -backend-config="key=${{env.backend_key}}" -backend-config="region=${{env.region}}"
+#         working-directory: ${{env.tf_dir}}
+
+#       - name: Sam Delete
+#         run: sam delete  --config-file samconfig.toml --config-env ${{env.stage}}
+#         working-directory: ${{env.sam_dir}}
+
+#       - name: Terraform destroy
+#         run: terraform destroy -var-file=${{env.tf_var_file}} -auto-approve
+#         working-directory: ${{env.tf_dir}}
