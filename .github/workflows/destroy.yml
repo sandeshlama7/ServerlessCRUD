@@ -39,13 +39,13 @@
 #           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
 #           aws-region: ${{ env.region }}
 
+#       - name: Sam Delete
+#         run: sam delete --config-file samconfig.toml --config-env ${{env.stage}} --no-promts
+#         working-directory: ${{env.sam_dir}}
+
 #       - name: Terraform Init
 #         run: terraform init  -backend-config="bucket=${{env.backend_bucket}}" -backend-config="key=${{env.backend_key}}" -backend-config="region=${{env.region}}"
 #         working-directory: ${{env.tf_dir}}
-
-#       - name: Sam Delete
-#         run: sam delete  --config-file samconfig.toml --config-env ${{env.stage}}
-#         working-directory: ${{env.sam_dir}}
 
 #       - name: Terraform destroy
 #         run: terraform destroy -var-file=${{env.tf_var_file}} -auto-approve

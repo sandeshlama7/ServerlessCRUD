@@ -15,7 +15,7 @@ env:
   backend_bucket: "8586-terraform-state"
   backend_key: "production/terraform.tfstate"
   region: "us-east-1"
-  tf_var_file: prod.tfvars
+  prod_tf_var_file: prod.tfvars
 
 jobs:
   infra-terraform:
@@ -54,9 +54,74 @@ jobs:
       #   run: terraform destroy -var-file=${{env.tf_var_file}} -auto-approve
       #   working-directory: ${{env.tf_dir}}
 
+  infra-sam:
+    runs-on: ubuntu-latest
+    needs:
+      - infra-terraform
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: AWS Creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Install sam cli and cloudformation linter
+        run: pip install aws-sam-cli cfn-lint cfn-lint-serverless
+
+      - name: lint sam
+        run: sam validate & cfn-lint template.yml -a cfn_lint_serverless.rules
+        working-directory: ${{env.sam_dir}}
+        continue-on-error: true
+
+      - name: Add the necessary values in respective env variables
+        uses: mathiasvr/command-output@v2.0.0
+        id: get-resources
+        with:
+          run: |
+            state_file_name=$backend_key
+            aws s3 cp s3://$backend_bucket/$backend_key $state_file_name
+            vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
+            private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value | join(",")')
+            public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value | join(",")')
+            rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
+            s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
+            vpc_sg=$(terraform output --json -state=$state_file_name | jq -r '.vpc_sg.value')
+            lambdaSG=$(terraform output --json -state=$state_file_name | jq -r '.lambdaSG.value')
+            rdsDB=$(terraform output --json -state=$state_file_name | jq -r '.rds_db_name.value')
+            rdsUSERNAME=$(terraform output --json -state=$state_file_name | jq -r '.rds_username.value')
+            secretsARN=$(terraform output --json -state=$state_file_name | jq -r '.secretsARN.value')
+            secretsName=$(terraform output --json -state=$state_file_name | jq -r '.secretsName.value')
+
+            echo "LAMBDA_SG=$lambdaSG" >> "$GITHUB_ENV"
+            echo "RDS_DB=$rdsDB" >> "$GITHUB_ENV"
+            echo "RDS_USERNAME=$rdsUSERNAME" >> "$GITHUB_ENV"
+            echo "SECRETS_ARN=$secretsARN" >> "$GITHUB_ENV"
+            echo "SECRETS_NAME=$secretsName" >> "$GITHUB_ENV"
+            echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
+            echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
+            echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
+            echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
+            echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
+            echo "VPC_SG=$vpc_sg" >> "$GITHUB_ENV"
+
+      - run: echo "VPC_SG=${{ env.VPC_SG }}, PRIVATE_SUBNET_IDS=${{ env.PRIVATE_SUBNET_IDS }}"
+
+      - name: Package sam
+        run: sam package --s3-bucket ${{ env.backend_bucket }}
+        working-directory: ${{env.sam_dir}}
+
+      - name: Deploy sam
+        run: sam deploy --config-file samconfig.toml --config-env ${{env.stage}} --parameter-overrides LambdaSG=${{env.LAMBDA_SG}} PrivateSubnetIds=${{ env.PRIVATE_SUBNET_IDS }} Stage=${{env.stage}} RDSHOST=${{env.RDS_PROXY_ENDPOINT}} DBNAME=${{env.RDS_DB}} USERNAME=${{env.RDS_USERNAME}} SECRET=${{env.SECRETS_NAME}}
+        working-directory: ${{env.sam_dir}}
+
   upload-frontend:
     runs-on: ubuntu-latest
-    needs: infra-terraform
+    needs: infra-sam
 
     steps:
       - uses: actions/checkout@v4
@@ -71,6 +136,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{env.region}}
+
+      - name: Describe CloudFormation Stack
+        id: api-url
+        run: |
+          STACK_NAME="lamabook-${{env.stage}}-stack"
+          OUTPUT_KEY="ApiInvokeUrl"
+          API_INVOKE_URL=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='$OUTPUT_KEY'].OutputValue" --output text)
+          echo "API Invoke URL: $API_INVOKE_URL"
+          echo "API_INVOKE_URL=$API_INVOKE_URL" >> $GITHUB_ENV
 
       - name: Add the necessary values in respective env variables
         uses: mathiasvr/command-output@v2.0.0
@@ -104,58 +178,3 @@ jobs:
 
       - name: Upload the built frontend to S3
         run: aws s3 cp client/build/ s3://$S3BUCKET/ --recursive
-
-  infra-sam:
-    runs-on: ubuntu-latest
-    needs:
-      - upload-frontend
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: AWS Creds
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: us-east-1
-
-      - name: Install sam cli and cloudformation linter
-        run: pip install aws-sam-cli cfn-lint cfn-lint-serverless
-
-      # - name: lint sam
-      #   run: sam validate & cfn-lint template.yml -a cfn_lint_serverless.rules
-      #   working-directory: ${{env.sam_dir}}
-
-      - name: Add the necessary values in respective env variables
-        uses: mathiasvr/command-output@v2.0.0
-        id: get-resources
-        with:
-          run: |
-            state_file_name=$backend_key
-            aws s3 cp s3://$backend_bucket/$backend_key $state_file_name
-            vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
-            private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value | join(",")')
-            public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value | join(",")')
-            rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
-            s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
-            vpc_sg=$(terraform output --json -state=$state_file_name | jq -r '.vpc_sg.value')
-
-
-            echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
-            echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
-            echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
-            echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
-            echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
-            echo "VPC_SG=$vpc_sg" >> "$GITHUB_ENV"
-
-      - run: echo "VPC_SG=${{ env.VPC_SG }}, PRIVATE_SUBNET_IDS=${{ env.PRIVATE_SUBNET_IDS }}"
-
-      - name: Package sam
-        run: sam package --s3-bucket ${{ env.backend_bucket }}
-        working-directory: ${{env.sam_dir}}
-
-      - name: Deploy sam
-        run: sam deploy --config-file samconfig.toml --config-env ${{env.stage}} --parameter-overrides VpcSG=${{env.VPC_SG}} PrivateSubnetIds=${{ env.PRIVATE_SUBNET_IDS }} Stage=${{env.stage}}
-        working-directory: ${{env.sam_dir}}

@@ -1,4 +1,3 @@
-
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
@@ -13,7 +12,7 @@ Globals:
 Parameters:
   Project:
     Type: String
-    Default: lamablog
+    Default: lamabooks
   Stage:
     Type: String
     Default: development
@@ -21,7 +20,7 @@ Parameters:
       - development
       - production
       - testing
-  VpcSG:
+  LambdaSG:
     Type: CommaDelimitedList
     # Type: 'List<AWS::EC2::SecurityGroup::Id>'
     Default: sg-03df20d6d58be3b3a
@@ -29,15 +28,44 @@ Parameters:
     Type: CommaDelimitedList
     # Type: 'List<AWS::EC2::Subnet:id>'
     Default: "subnet-0605e6a6661666c06"
+  RDSHOST:
+    Type: String
+    Default: "something"
+  DBNAME:
+    Type: String
+    Default: "books"
+  SECRET:
+    Type: String
+    Default: "secret"
+  USERNAME:
+    Type: String
+    Default: "admin"
+  REGION:
+    Type: String
+    Default: "us-east-1"
 
 Resources:
-  BackendFunction:
+  PyMysqlLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: Layers/pymysql
+      CompatibleRuntimes:
+        - python3.12
+        - python3.11
+      CompatibleArchitectures:
+        - x86_64
+        - arm64
+    Metadata:
+      BuildMethod: python3.12   # Required to have AWS SAM build this layer
+      BuildArchitecture: x86_64
+
+  BooksLambda:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${Project}-${Stage}-BackendFunction"
-      MemorySize: 128
+      FunctionName: !Sub "${Project}-${Stage}-BooksLambda"
+      MemorySize: 256
       CodeUri: lambda/
-      Handler: lambda_function.lambda_handler
+      Handler: books.lambda_handler
       Layers:
         - Ref: PyMysqlLayer
 
@@ -55,82 +83,59 @@ Resources:
             - rds-db:connect
             Resource: '*'
       VpcConfig:
-        SecurityGroupIds: !Ref VpcSG
-          # - sg-0a22c44730333ba85
-        SubnetIds: !Ref PrivateSubnetIds
-          # - subnet-02569b7b31a687ca3
-          # - subnet-043079b0d9d03633a
+        SecurityGroupIds: #!Ref LambdaSG
+          - sg-0dfacd4635602ed6b
+        SubnetIds: #!Ref PrivateSubnetIds
+          - subnet-002be4c548666cd41
+          - subnet-03efa00c971dc49eb
       Environment:
         Variables:
-          DB_NAME: "blog"
-          USERNAME: "admin"
-          RDS_PROXY_HOST: "something"
-      Events:
-        RegisterUser:
-          Type: Api
-          Properties:
-            Path: /register
-            Method: POST
-            RestApiId: !Ref BackendAPI
-        LoginUser:
-          Type: Api
-          Properties:
-            Path: /login
-            Method: GET
-            RestApiId: !Ref BackendAPI
-        GetPosts:
-          Type: Api
-          Properties:
-            Path: /posts
-            Method: GET
-            RestApiId: !Ref BackendAPI
-        GetPost:
-          Type: Api
-          Properties:
-            Path: /posts/{id}
-            Method: GET
-            RestApiId: !Ref BackendAPI
-        AddPost:
-          Type: Api
-          Properties:
-            Path: /posts
-            Method: POST
-            RestApiId: !Ref BackendAPI
-        DeletePost:
-          Type: Api
-          Properties:
-            Path: /posts/{id}
-            Method: DELETE
-            RestApiId: !Ref BackendAPI
-        UpdatePost:
-          Type: Api
-          Properties:
-            Path: /posts/{id}
-            Method: PUT
-            RestApiId: !Ref BackendAPI
+          RDS_PROXY_HOST: !Ref RDSHOST
+          USERNAME: !Ref USERNAME
+          DB_NAME: !Ref DBNAME
+          SECRET: !Ref SECRET
+          REGION: !Ref REGION
 
-  BackendAPI:
+      Events:
+        AddBook:
+          Type: Api
+          Properties:
+            Path: /books
+            Method: POST
+            RestApiId: !Ref BooksApi
+        GetBooks:
+          Type: Api
+          Properties:
+            Path: /books
+            Method: GET
+            RestApiId: !Ref BooksApi
+        DeleteBook:
+          Type: Api
+          Properties:
+            Path: /books/{id}
+            Method: DELETE
+            RestApiId: !Ref BooksApi
+        GetBook:
+          Type: Api
+          Properties:
+            Path: /books/{id}
+            Method: GET
+            RestApiId: !Ref BooksApi
+        UpdateBook:
+          Type: Api
+          Properties:
+            Path: /books/{id}
+            Method: PUT
+            RestApiId: !Ref BooksApi
+
+
+  BooksApi:
     Type: AWS::Serverless::Api
     Properties:
-      # ApiKeySourceType: HEADER
       EndpointConfiguration: REGIONAL
-      Name: !Sub "${Project}-${Stage}-api"
+      Name: !Sub "${Project}-${Stage}-books-api"
       StageName: !Ref Stage
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'content-type'"
         AllowOrigin: "'*'"
-
-  PyMysqlLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      ContentUri: Layers/pymysql
-      CompatibleRuntimes:
-        - python3.12
-        - python3.11
-      CompatibleArchitectures:
-        - x86_64
-        - arm64
-    Metadata:
-      BuildMethod: python3.12   # Required to have AWS SAM build this layer
-      BuildArchitecture: x86_64

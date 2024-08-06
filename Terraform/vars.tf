@@ -72,6 +72,11 @@ variable "rds_storage" {
   description = "The amount of Storage for RDS in GiB"
   type        = number
 }
+variable "max_storage" {
+  description = "The maximum storage for rds autoscaling"
+  type        = number
+  default     = 0
+}
 variable "multi_az" {
   description = "Whether to create a multi AZ RDS or not"
   type        = bool

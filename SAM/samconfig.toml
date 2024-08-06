@@ -1,8 +1,8 @@
 version = 0.1
 [development.deploy.parameters]
-stack_name = "lamablog-development-stack"
+stack_name = "lamabooks-development-stack"
 s3_bucket = "8586-terraform-state"
-s3_prefix = "lamablog-development"
+s3_prefix = "lamabooks-development"
 region = "us-east-1"
 confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
@@ -10,9 +10,9 @@ disable_rollback = true
 parameter_overrides = "Stage=\"development\""
 
 [production.deploy.parameters]
-stack_name = "lamablog-production-stack"
+stack_name = "lamabooks-production-stack"
 s3_bucket = "8586-terraform-state"
-s3_prefix = "lamablog-production"
+s3_prefix = "lamabooks-production"
 region = "us-east-1"
 confirm_changeset = false
 capabilities = "CAPABILITY_IAM"

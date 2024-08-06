@@ -22,6 +22,7 @@ locals {
   engine_version    = var.engine_version
   db_instance_class = var.db_instance_class
   rds_storage       = var.rds_storage
+  max_storage       = var.max_storage
   multi_az          = var.multi_az
   rds_db            = var.rds_db
   rds_username      = var.rds_username

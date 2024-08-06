@@ -3,18 +3,19 @@ module "rds" {
 
   identifier = local.rds_identifier
 
-  engine            = local.engine
-  engine_version    = local.engine_version
-  instance_class    = local.db_instance_class
-  allocated_storage = local.rds_storage
-  multi_az          = local.multi_az
+  engine                = local.engine
+  engine_version        = local.engine_version
+  instance_class        = local.db_instance_class
+  allocated_storage     = local.rds_storage
+  max_allocated_storage = local.max_storage
+  multi_az              = local.multi_az
 
 
   db_name  = local.rds_db
   username = local.rds_username
   port     = local.rds_port
 
-  vpc_security_group_ids = [module.vpc.default_security_group_id, module.db_security_group.security_group_id]
+  vpc_security_group_ids = [module.vpc.default_security_group_id, module.rds_sg.security_group_id]
 
   maintenance_window = "Mon:00:00-Mon:03:00"
   backup_window      = "03:00-06:00"
