@@ -1,7 +1,11 @@
 locals {
-  region        = var.region
-  prefix        = "${var.project}-${var.environment}"
+  region = var.region
+
+  ###### Naming module
   naming_prefix = var.naming_prefix
+  project_short = var.project_short
+  project       = var.project
+  environment   = var.environment
 
   ###### VPC
   vpc = {
@@ -10,11 +14,6 @@ locals {
     azs  = slice(data.aws_availability_zones.available.names, 0, var.number_of_azs)
   }
   number_of_azs = var.number_of_azs
-
-  ###### Tags
-  project_short = var.project_short
-  project       = var.project
-  environment   = var.environment
 
   ###### RDS
   rds_identifier    = module.naming.resources.rds.name
@@ -31,6 +30,9 @@ locals {
   proxy_name = "${local.rds_identifier}-proxy"
   proxy_role = "${local.proxy_name}-role"
 
+  password_rotation           = var.password_rotation
+  password_rotation_frequency = var.password_rotation_frequency
+
   deletion_protection = var.deletion_protection
 
   #### S3
@@ -41,7 +43,6 @@ locals {
   s3versioning    = var.s3versioning
 
   domain_name = "${local.project}.${local.environment}.sandbox.adex.ltd"
-  # domain_name = "${local.project}.sandbox.adex.ltd"
 
   #### Cloudfront
   price_class         = var.price_class

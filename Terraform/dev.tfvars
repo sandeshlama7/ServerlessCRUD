@@ -10,6 +10,7 @@ db_instance_class   = "db.t3.small"
 rds_storage         = 20
 rds_db              = "books"
 rds_username        = "admin"
+password_rotation   = false
 s3force_destroy     = true
 s3versioning        = false
 multi_az            = false

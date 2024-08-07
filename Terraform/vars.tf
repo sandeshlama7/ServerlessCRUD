@@ -95,6 +95,14 @@ variable "rds_port" {
   type        = string
   default     = "3306"
 }
+variable "password_rotation" {
+  description = "Whether to enable automatic password rotation"
+  type        = bool
+}
+variable "password_rotation_frequency" {
+  description = "The number of days between automatic password rotations"
+  type        = number
+}
 variable "deletion_protection" {
   type = bool
 }

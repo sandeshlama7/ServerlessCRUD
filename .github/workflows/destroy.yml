@@ -40,7 +40,7 @@
 #           aws-region: ${{ env.region }}
 
 #       - name: Sam Delete
-#         run: sam delete --config-file samconfig.toml --config-env ${{env.stage}} --no-promts
+#         run: sam delete --config-file samconfig.toml --config-env ${{env.stage}} --no-prompts
 #         working-directory: ${{env.sam_dir}}
 
 #       - name: Terraform Init

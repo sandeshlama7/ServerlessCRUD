@@ -15,6 +15,9 @@ module "rds" {
   username = local.rds_username
   port     = local.rds_port
 
+  manage_master_user_password_rotation                   = local.password_rotation
+  master_user_password_rotation_automatically_after_days = local.password_rotation_frequency
+
   vpc_security_group_ids = [module.vpc.default_security_group_id, module.rds_sg.security_group_id]
 
   maintenance_window = "Mon:00:00-Mon:03:00"
