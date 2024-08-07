@@ -118,3 +118,23 @@ variable "default_root_object" {
   description = "The default root object that the cloudfront fetches the content from"
   type        = string
 }
+
+
+##############
+## SNS
+##############
+variable "create_topic_policy" {
+  description = "Whether to create a topic policy or not"
+  type        = bool
+  default     = true
+}
+variable "subscription_endpoint" {
+  description = "The endpoint for the sns topic subscription"
+  type        = string
+  default = "sandeshislama7@gmail.com"
+}
+variable "subscription_protocol" {
+  description = "The type of sns topic subscription"
+  type        = string
+  default = "email"
+}

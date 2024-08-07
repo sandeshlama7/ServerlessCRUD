@@ -48,4 +48,13 @@ locals {
   price_class         = var.price_class
   default_root_object = var.default_root_object
 
+
+  ####### SNS
+  sns = {
+    name                  = module.naming.resources.sns.name
+    create_topic_policy   = var.create_topic_policy
+    subscription_protocol = var.subscription_protocol
+    subscription_endpoint = var.subscription_endpoint
+  }
+
 }
