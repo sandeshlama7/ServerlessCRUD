@@ -12,8 +12,8 @@ module "rds_alarm" {
   threshold           = each.value.threshold
   alarm_description   = each.value.alarm_description
 
+  namespace = "AWS/RDS"
   alarm_actions = [module.sns_topic.topic_arn]
-
 
   dimensions = {
     DBInstanceIdentifier = module.rds.db_instance_identifier
