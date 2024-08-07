@@ -57,4 +57,35 @@ locals {
     subscription_endpoint = var.subscription_endpoint
   }
 
+  ####### CloudWatch ALARMS #####
+  rdsALARM = {
+    cpu = {
+      comparison_operator = "GreaterThanThreshold"
+      evaluation_periods  = 2
+      metric_name         = "CPUUtilization"
+      period              = 60
+      statistic           = "Average"
+      threshold           = 85
+      alarm_description   = "ALARM when RDS Instance CPU Utilization is over 85%"
+    },
+    storage = {
+      comparison_operator = "LessThanThreshold"
+      evaluation_periods  = 3
+      metric_name         = "FreeLocalStoragePercent"
+      period              = 60
+      statistic           = "Average"
+      threshold           = 10
+      alarm_description   = "ALARM when RDS Free Storage Average is below 10 %"
+    },
+    connection = {
+      comparison_operator = "GreaterThanThreshold"
+      evaluation_periods  = 2
+      metric_name         = "DatabaseConnections"
+      period              = 60
+      statistic           = "Average"
+      threshold           = 30
+      alarm_description   = "ALARM when Active DB Connection Average is over 30"
+  }
+
+}
 }
