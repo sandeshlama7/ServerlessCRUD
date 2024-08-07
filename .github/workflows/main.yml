@@ -107,7 +107,7 @@ jobs:
             vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
             private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value | join(",")')
             public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value | join(",")')
-            rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_identifier.value')
+            rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_endpoint.value')
             s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
             vpc_sg=$(terraform output --json -state=$state_file_name | jq -r '.vpc_sg.value')
             lambdaSG=$(terraform output --json -state=$state_file_name | jq -r '.lambdaSG.value')
@@ -132,6 +132,7 @@ jobs:
             echo ${{env.RDS_DB}}
             echo ${{env.RDS_USERNAME}}
             echo ${{env.SECRETS_ARN}}
+            echo ${{env.RDS_PROXY_ENDPOINT}}
 
       - name: Package sam
         run: sam package --s3-bucket ${{ env.backend_bucket }}
