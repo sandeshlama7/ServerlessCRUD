@@ -15,7 +15,7 @@ env:
   backend_bucket: "8586-terraform-state"
   backend_key: "production/terraform.tfstate"
   region: "us-east-1"
-  prod_tf_var_file: prod.tfvars
+  tf_var_file: prod.tfvars
 
 jobs:
   infra-terraform:
