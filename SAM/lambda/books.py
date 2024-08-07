@@ -30,8 +30,6 @@ user_name = os.environ['USERNAME']
 rds_proxy_host = os.environ['RDS_PROXY_HOST']
 db_name = os.environ['DB_NAME']
 password = get_secret()
-print(user_name)
-print(password)
 
 try:
     conn = pymysql.connect(host=rds_proxy_host, user=user_name, passwd=password, ssl={'ca': '/etc/ssl/cert.pem'}, connect_timeout=5)
