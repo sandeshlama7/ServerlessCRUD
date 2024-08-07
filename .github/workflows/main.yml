@@ -112,7 +112,7 @@ jobs:
             echo ${{env.LAMBDA_SG}}
             echo ${{env.RDS_DB}}
             echo ${{env.RDS_USERNAME}}
-            echo ${{emv.SECRETS_ARN}}
+            echo ${{env.SECRETS_ARN}}
 
 
       # - name: Package sam
