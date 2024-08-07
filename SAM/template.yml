@@ -144,4 +144,4 @@ Resources:
 Outputs:
   ApiInvokeURL:
     Description: "Invoke URL for the API"
-    Value: !Sub "https://${BooksApi}.execute-api.${AWS::Region}.amazonaws.com/${stage}/"
+    Value: !Sub "https://${BooksApi}.execute-api.${AWS::Region}.amazonaws.com/"
