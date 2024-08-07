@@ -102,6 +102,7 @@ variable "password_rotation" {
 variable "password_rotation_frequency" {
   description = "The number of days between automatic password rotations"
   type        = number
+  default = 10
 }
 variable "deletion_protection" {
   type = bool
