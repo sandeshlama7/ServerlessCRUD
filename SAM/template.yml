@@ -63,7 +63,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "${Project}-${Stage}-BooksLambda"
-      MemorySize: 256
+      MemorySize: 512
       CodeUri: lambda/
       Handler: books.lambda_handler
       Layers:
