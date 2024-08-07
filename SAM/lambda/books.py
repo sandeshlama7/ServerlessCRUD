@@ -31,6 +31,8 @@ rds_proxy_host = os.environ['RDS_PROXY_HOST']
 db_name = os.environ['DB_NAME']
 password = get_secret()
 
+domain=os.environ['DOMAIN']
+
 try:
     conn = pymysql.connect(host=rds_proxy_host, user=user_name, passwd=password, ssl={'ca': '/etc/ssl/cert.pem'}, connect_timeout=5)
 except pymysql.MySQLError as e:
@@ -70,7 +72,7 @@ def build_response(status_code, body):
         'headers': {
             'Content-Type': 'application/json',
             # 'Access-Control-Allow-Origin': 'https://lamabooks.development.sandbox.adex.ltd'
-            'Access-Control-Allow-Origin': '*'
+            'Access-Control-Allow-Origin': domain
         }
     }
 

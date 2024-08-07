@@ -31,3 +31,6 @@ output "lambdaSG" {
 output "secretsARN" {
   value = module.rds.db_instance_master_user_secret_arn
 }
+output "domainAddress"{
+  value = "https://${local.domain_name}"
+}
