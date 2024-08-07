@@ -1,6 +1,6 @@
 name: Infrastructure setup
 
-run-name: ${{ github.actor }} is provisioning the infra
+# run-name: ${{ github.actor }} is provisioning the infra
 
 on:
   push:
@@ -124,7 +124,7 @@ jobs:
           echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
           echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
           echo "VPC_SG=$vpc_sg" >> "$GITHUB_ENV"
-          echo "DOMAIN=$domain" >> "GITHUB_ENV"
+          echo "DOMAIN=$domain" >> "$GITHUB_ENV"
 
       - run: |
             echo "VPC_SG=${{ env.VPC_SG }}, PRIVATE_SUBNET_IDS=${{ env.PRIVATE_SUBNET_IDS }}"
@@ -133,6 +133,7 @@ jobs:
             echo ${{env.RDS_USERNAME}}
             echo ${{env.SECRETS_ARN}}
             echo ${{env.RDS_PROXY_ENDPOINT}}
+            echo ${{env.DOMAIN}}
 
       - name: Package sam
         run: sam package --s3-bucket ${{ env.backend_bucket }}
