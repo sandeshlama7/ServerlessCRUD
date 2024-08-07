@@ -102,6 +102,7 @@ jobs:
               state_file_name=$prod_backend_key
             elif [[ "${GITHUB_REF}" == "refs/heads/dev-infra" ]]; then
               state_file_name=$dev_backend_key
+            fi
             aws s3 cp s3://$backend_bucket/$state_file_name $state_file_name
             vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
             private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value | join(",")')
@@ -191,7 +192,8 @@ jobs:
               state_file_name=$prod_backend_key
             elif [[ "${GITHUB_REF}" == "refs/heads/dev-infra" ]]; then
               state_file_name=$dev_backend_key
-            aws s3 cp s3://$backend_bucket/$backend_key $state_file_name
+            fi
+            aws s3 cp s3://$backend_bucket/$state_file_name $state_file_name
             s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
 
             echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
