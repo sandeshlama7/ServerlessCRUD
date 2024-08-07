@@ -140,13 +140,13 @@ jobs:
 
       - name: Deploy sam for prod
         if: github.ref == 'refs/heads/infra'
-        run: sam deploy --config-file samconfig.toml --config-env ${{env.prod_stage}} --parameter-overrides LambdaSG=${{env.LAMBDA_SG}} PrivateSubnetIds=${{ env.PRIVATE_SUBNET_IDS }} Stage=${{env.prod_stage}} RDSHOST=${{env.RDS_PROXY_ENDPOINT}} DBNAME=${{env.RDS_DB}} USERNAME=${{env.RDS_USERNAME}} SECRET=${{env.SECRETS_ARN}}
+        run: sam deploy --no-fail-on-empty-changeset --config-file samconfig.toml --config-env ${{env.prod_stage}} --parameter-overrides LambdaSG=${{env.LAMBDA_SG}} PrivateSubnetIds=${{ env.PRIVATE_SUBNET_IDS }} Stage=${{env.prod_stage}} RDSHOST=${{env.RDS_PROXY_ENDPOINT}} DBNAME=${{env.RDS_DB}} USERNAME=${{env.RDS_USERNAME}} SECRET=${{env.SECRETS_ARN}}
         working-directory: ${{env.sam_dir}}
 
-      # - name: Deploy sam for dev
-        # if: github.ref == 'refs/heads/dev-infra'
-      #   run: sam deploy --config-file samconfig.toml --config-env ${{env.dev_stage}} --parameter-overrides LambdaSG=${{env.LAMBDA_SG}} PrivateSubnetIds=${{ env.PRIVATE_SUBNET_IDS }} Stage=${{env.dev_stage}} RDSHOST=${{env.RDS_PROXY_ENDPOINT}} DBNAME=${{env.RDS_DB}} USERNAME=${{env.RDS_USERNAME}} SECRET=${{env.SECRETS_ARN}}
-      #   working-directory: ${{env.sam_dir}}
+      - name: Deploy sam for dev
+        if: github.ref == 'refs/heads/dev-infra'
+        run: sam deploy --no-fail-on-empty-changeset --config-file samconfig.toml --config-env ${{env.dev_stage}} --parameter-overrides LambdaSG=${{env.LAMBDA_SG}} PrivateSubnetIds=${{ env.PRIVATE_SUBNET_IDS }} Stage=${{env.dev_stage}} RDSHOST=${{env.RDS_PROXY_ENDPOINT}} DBNAME=${{env.RDS_DB}} USERNAME=${{env.RDS_USERNAME}} SECRET=${{env.SECRETS_ARN}}
+        working-directory: ${{env.sam_dir}}
 
   upload-frontend:
     runs-on: ubuntu-latest
