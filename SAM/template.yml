@@ -43,6 +43,9 @@ Parameters:
   REGION:
     Type: String
     Default: "us-east-1"
+  DOMAIN:
+    Type: String
+    Default: "*sandbox.adex.ltd"
 
 Resources:
   PyMysqlLayer:
@@ -84,10 +87,7 @@ Resources:
             Resource: '*'
       VpcConfig:
         SecurityGroupIds: !Ref LambdaSG
-          # - sg-0dfacd4635602ed6b
         SubnetIds: !Ref PrivateSubnetIds
-          # - subnet-002be4c548666cd41
-          # - subnet-03efa00c971dc49eb
       Environment:
         Variables:
           RDS_PROXY_HOST: !Ref RDSHOST
@@ -95,6 +95,7 @@ Resources:
           DB_NAME: !Ref DBNAME
           SECRET: !Ref SECRET
           REGION: !Ref REGION
+          DOMAIN: !Ref DOMAIN
 
       Events:
         AddBook:
