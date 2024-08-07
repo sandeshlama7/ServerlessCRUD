@@ -94,37 +94,35 @@ jobs:
         continue-on-error: true
 
       - name: Add the necessary values in respective env variables
-        uses: mathiasvr/command-output@v2.0.0
         id: get-resources
-        with:
-          run: |
-            if [[ "${GITHUB_REF}" == "refs/heads/infra" ]]; then
-              state_file_name=$prod_backend_key
-            elif [[ "${GITHUB_REF}" == "refs/heads/dev-infra" ]]; then
-              state_file_name=$dev_backend_key
-            fi
-            aws s3 cp s3://$backend_bucket/$state_file_name $state_file_name
-            vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
-            private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value | join(",")')
-            public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value | join(",")')
-            rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_endpoint.value')
-            s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
-            vpc_sg=$(terraform output --json -state=$state_file_name | jq -r '.vpc_sg.value')
-            lambdaSG=$(terraform output --json -state=$state_file_name | jq -r '.lambdaSG.value')
-            rdsDB=$(terraform output --json -state=$state_file_name | jq -r '.rds_db_name.value')
-            rdsUSERNAME=$(terraform output --json -state=$state_file_name | jq -r '.rds_username.value')
-            secretsARN=$(terraform output --json -state=$state_file_name | jq -r '.secretsARN.value')
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/infra" ]]; then
+            state_file_name=$prod_backend_key
+          elif [[ "${GITHUB_REF}" == "refs/heads/dev-infra" ]]; then
+            state_file_name=$dev_backend_key
+          fi
+          aws s3 cp s3://$backend_bucket/$state_file_name $state_file_name
+          vpc_id=$(terraform output --json -state=$state_file_name | jq -r '.vpc_id.value')
+          private_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.private_subnet_ids.value | join(",")')
+          public_subnet_ids=$(terraform output --json -state=$state_file_name | jq -r '.public_subnet_ids.value | join(",")')
+          rds_proxy_endpoint=$(terraform output --json -state=$state_file_name | jq -r '.rds_proxy_endpoint.value')
+          s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
+          vpc_sg=$(terraform output --json -state=$state_file_name | jq -r '.vpc_sg.value')
+          lambdaSG=$(terraform output --json -state=$state_file_name | jq -r '.lambdaSG.value')
+          rdsDB=$(terraform output --json -state=$state_file_name | jq -r '.rds_db_name.value')
+          rdsUSERNAME=$(terraform output --json -state=$state_file_name | jq -r '.rds_username.value')
+          secretsARN=$(terraform output --json -state=$state_file_name | jq -r '.secretsARN.value')
 
-            echo "LAMBDA_SG=$lambdaSG" >> "$GITHUB_ENV"
-            echo "RDS_DB=$rdsDB" >> "$GITHUB_ENV"
-            echo "RDS_USERNAME=$rdsUSERNAME" >> "$GITHUB_ENV"
-            echo "SECRETS_ARN=$secretsARN" >> "$GITHUB_ENV"
-            echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
-            echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
-            echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
-            echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
-            echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
-            echo "VPC_SG=$vpc_sg" >> "$GITHUB_ENV"
+          echo "LAMBDA_SG=$lambdaSG" >> "$GITHUB_ENV"
+          echo "RDS_DB=$rdsDB" >> "$GITHUB_ENV"
+          echo "RDS_USERNAME=$rdsUSERNAME" >> "$GITHUB_ENV"
+          echo "SECRETS_ARN=$secretsARN" >> "$GITHUB_ENV"
+          echo "PRIVATE_SUBNET_IDS=$private_subnet_ids" >> "$GITHUB_ENV"
+          echo "PUBLIC_SUBNET_IDS=$public_subnet_ids" >> "$GITHUB_ENV"
+          echo "VPC_ID=$vpc_id" >> "$GITHUB_ENV"
+          echo "RDS_PROXY_ENDPOINT=$rds_proxy_endpoint" >>"$GITHUB_ENV"
+          echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
+          echo "VPC_SG=$vpc_sg" >> "$GITHUB_ENV"
 
       - run: |
             echo "VPC_SG=${{ env.VPC_SG }}, PRIVATE_SUBNET_IDS=${{ env.PRIVATE_SUBNET_IDS }}"
@@ -148,75 +146,85 @@ jobs:
         run: sam deploy --no-fail-on-empty-changeset --config-file samconfig.toml --config-env ${{env.dev_stage}} --parameter-overrides LambdaSG=${{env.LAMBDA_SG}} PrivateSubnetIds=${{ env.PRIVATE_SUBNET_IDS }} Stage=${{env.dev_stage}} RDSHOST=${{env.RDS_PROXY_ENDPOINT}} DBNAME=${{env.RDS_DB}} USERNAME=${{env.RDS_USERNAME}} SECRET=${{env.SECRETS_ARN}}
         working-directory: ${{env.sam_dir}}
 
-  upload-frontend:
-    runs-on: ubuntu-latest
-    needs: infra-sam
+  # upload-frontend:
+  #   runs-on: ubuntu-latest
+  #   needs: infra-sam
 
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Install awscli
-        run: sudo snap install aws-cli --classic
+  #     - name: Install awscli
+  #       run: sudo snap install aws-cli --classic
 
-      - name: export AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: ${{env.region}}
+  #     - name: export AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+  #         aws-region: ${{env.region}}
 
-      - name: Describe CloudFormation Stack for prod
-        if: github.ref == 'refs/heads/infra'
-        run: |
-          STACK_NAME="lamabooks-${{env.prod_stage}}-stack"
-          OUTPUT_KEY="ApiInvokeURL"
-          API_INVOKE_URL=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='$OUTPUT_KEY'].OutputValue" --output text)
-          echo "API Invoke URL: $API_INVOKE_URL"
-          echo "API_INVOKE_URL=$API_INVOKE_URL" >> $GITHUB_ENV
+  #     - name: Describe CloudFormation Stack for prod
+  #       if: github.ref == 'refs/heads/infra'
+  #       run: |
+  #         STACK_NAME="lamabooks-${{env.prod_stage}}-stack"
+  #         OUTPUT_KEY="ApiInvokeURL"
+  #         API_INVOKE_URL=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='$OUTPUT_KEY'].OutputValue" --output text)
+  #         echo "API Invoke URL: $API_INVOKE_URL"
+  #         echo "API_INVOKE_URL=$API_INVOKE_URL" >> $GITHUB_ENV
 
-      - name: Describe CloudFormation Stack for dev
-        if: github.ref == 'refs/heads/dev-infra'
-        run: |
-          STACK_NAME="lamabooks-${{env.prod_stage}}-stack"
-          OUTPUT_KEY="ApiInvokeURL"
-          API_INVOKE_URL=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='$OUTPUT_KEY'].OutputValue" --output text)
-          echo "API Invoke URL: $API_INVOKE_URL"
-          echo "API_INVOKE_URL=$API_INVOKE_URL" >> $GITHUB_ENV
+  #     - name: Describe CloudFormation Stack for dev
+  #       if: github.ref == 'refs/heads/dev-infra'
+  #       run: |
+  #         STACK_NAME="lamabooks-${{env.dev_stage}}-stack"
+  #         OUTPUT_KEY="ApiInvokeURL"
+  #         API_INVOKE_URL=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='$OUTPUT_KEY'].OutputValue" --output text)
+  #         echo "API Invoke URL: $API_INVOKE_URL"
+  #         echo "API_INVOKE_URL=$API_INVOKE_URL" >> $GITHUB_ENV
 
-      - name: Add the necessary values in respective env variables
-        uses: mathiasvr/command-output@v2.0.0
-        id: get-resources
-        with:
-          run: |
-            if [[ "${GITHUB_REF}" == "refs/heads/infra" ]]; then
-              state_file_name=$prod_backend_key
-            elif [[ "${GITHUB_REF}" == "refs/heads/dev-infra" ]]; then
-              state_file_name=$dev_backend_key
-            fi
-            aws s3 cp s3://$backend_bucket/$state_file_name $state_file_name
-            s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
+  #     - name: Add the API INVOKE URL to .env of frontend
+  #       run: |
+  #         if [[ "${GITHUB_REF}" == "refs/heads/infra" ]]; then
+  #           stage=$prod_stage
+  #         elif [[ "${GITHUB_REF}" == "refs/heads/dev-infra" ]]; then
+  #           stage=$dev_stage
+  #         fi
+  #         echo "REACT_APP_BASE_URl=${{env.API_INVOKE_URL}}$stage" > .env
+  #       working-directory: client
 
-            echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
+  #     - name: Add the necessary values in respective env variables
+  #       uses: mathiasvr/command-output@v2.0.0
+  #       id: get-resources
+  #       with:
+  #         run: |
+  #           if [[ "${GITHUB_REF}" == "refs/heads/infra" ]]; then
+  #             state_file_name=$prod_backend_key
+  #           elif [[ "${GITHUB_REF}" == "refs/heads/dev-infra" ]]; then
+  #             state_file_name=$dev_backend_key
+  #           fi
+  #           aws s3 cp s3://$backend_bucket/$state_file_name $state_file_name
+  #           s3bucket=$(terraform output --json -state=$state_file_name | jq -r '.s3bucket.value')
 
-      - name: Echo bucket name
-        run: echo ${{env.S3BUCKET}}
+  #           echo "S3BUCKET=$s3bucket" >> "$GITHUB_ENV"
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      # - run: npm ci
-      # - run: npm test
+  #     - name: Echo bucket name
+  #       run: echo ${{env.S3BUCKET}}
 
-      - name: Install react dependencies
-        run: npm install
-        working-directory: client
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #     # - run: npm ci
+  #     # - run: npm test
 
-      - name: build react app
-        run: npm run build
-        working-directory: client
-        env:
-          CI: false
+  #     - name: Install react dependencies
+  #       run: npm install
+  #       working-directory: client
 
-      - name: Upload the built frontend to S3
-        run: aws s3 cp client/build/ s3://$S3BUCKET/ --recursive
+  #     - name: build react app
+  #       run: npm run build
+  #       working-directory: client
+  #       env:
+  #         CI: false
+
+  #     - name: Upload the built frontend to S3
+  #       run: aws s3 cp client/build/ s3://$S3BUCKET/ --recursive
