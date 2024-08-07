@@ -189,7 +189,7 @@ jobs:
           elif [[ "${GITHUB_REF}" == "refs/heads/dev-infra" ]]; then
             stage=$dev_stage
           fi
-          echo "REACT_APP_BASE_URl=${{env.API_INVOKE_URL}}$stage" > .env
+          echo "REACT_APP_BASE_URL=${{env.API_INVOKE_URL}}$stage/" > .env
         working-directory: client
 
       - run: cat .env

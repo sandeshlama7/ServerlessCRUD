@@ -69,7 +69,9 @@ def build_response(status_code, body):
         'body': json.dumps(body, cls=DecimalEncoder),
         'headers': {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': 'https://lamabooks.development.sandbox.adex.ltd'
+            # 'Access-Control-Allow-Origin': 'https://lamabooks.development.sandbox.adex.ltd'
+            'Access-Control-Allow-Origin': '*'
+
         }
     }
 
