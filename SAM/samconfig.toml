@@ -10,9 +10,9 @@ disable_rollback = true
 parameter_overrides = "Stage=\"development\""
 
 [production.deploy.parameters]
-stack_name = "lamabooks-production-stack"
+stack_name = "lamabook-production-stack"
 s3_bucket = "8586-terraform-state"
-s3_prefix = "lamabooks-production"
+s3_prefix = "lamabook-production"
 region = "us-east-1"
 confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
