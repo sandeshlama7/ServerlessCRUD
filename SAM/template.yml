@@ -58,7 +58,7 @@ Resources:
         - x86_64
         - arm64
     Metadata:
-      BuildMethod: python3.12   # Required to have AWS SAM build this layer
+      BuildMethod: python3.12 
       BuildArchitecture: x86_64
 
   BooksLambda:
