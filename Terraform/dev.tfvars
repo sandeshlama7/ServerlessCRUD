@@ -17,3 +17,4 @@ multi_az            = false
 deletion_protection = false
 price_class         = "PriceClass_100"
 default_root_object = "index.html"
+ 
