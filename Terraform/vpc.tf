@@ -6,7 +6,7 @@ module "vpc" {
 
   azs             = local.vpc.azs
   private_subnets = [for k, v in local.vpc.azs : cidrsubnet(local.vpc.cidr, 4, k)]
-  public_subnets = [cidrsubnet(local.vpc.cidr, 4, local.number_of_azs)]
+  public_subnets  = [cidrsubnet(local.vpc.cidr, 4, local.number_of_azs)]
 
   enable_nat_gateway   = true
   single_nat_gateway   = true

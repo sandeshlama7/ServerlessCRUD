@@ -1,5 +1,5 @@
 locals {
-  region = var.region
+  region            = var.region
   validation_method = var.validation_method
 
   ###### Naming module
@@ -86,7 +86,7 @@ locals {
       statistic           = "Average"
       threshold           = 30
       alarm_description   = "ALARM when Active DB Connection Average is over 30"
-  }
+    }
 
-}
+  }
 }

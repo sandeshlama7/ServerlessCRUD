@@ -8,11 +8,6 @@ module "s3_bucket" {
   control_object_ownership = true
   object_ownership         = "ObjectWriter"
 
-  # website = {
-  #   index_document : "index.html"
-  #   error_document : "index.html"
-  # }
-
   versioning = {
     enabled = local.s3versioning
   }

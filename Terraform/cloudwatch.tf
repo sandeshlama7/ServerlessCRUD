@@ -1,7 +1,7 @@
 module "rds_alarm" {
-  source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
+  source = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
 
-  for_each = local.rdsALARM
+  for_each   = local.rdsALARM
   alarm_name = "${module.rds.db_instance_identifier}-alarm${each.key}"
 
   comparison_operator = each.value.comparison_operator
@@ -12,7 +12,7 @@ module "rds_alarm" {
   threshold           = each.value.threshold
   alarm_description   = each.value.alarm_description
 
-  namespace = "AWS/RDS"
+  namespace     = "AWS/RDS"
   alarm_actions = [module.sns_topic.topic_arn]
 
   dimensions = {
