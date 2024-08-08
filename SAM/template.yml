@@ -12,7 +12,7 @@ Globals:
 Parameters:
   Project:
     Type: String
-    Default: lamabooks
+    Default: lamabook
   Stage:
     Type: String
     Default: development
