@@ -5,8 +5,8 @@ name: Infrastructure setup
 on:
   push:
     branches: [ "infra", "dev-infra" ]
-  # pull_request:
-  #   branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 env:
   tf_dir: Terraform
@@ -217,8 +217,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      # - run: npm ci
-      # - run: npm test
 
       - name: Install react dependencies
         run: npm install
