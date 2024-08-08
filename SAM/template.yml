@@ -58,7 +58,7 @@ Resources:
         - x86_64
         - arm64
     Metadata:
-      BuildMethod: python3.12 
+      BuildMethod: python3.12
       BuildArchitecture: x86_64
 
   BooksLambda:
@@ -71,9 +71,9 @@ Resources:
       Layers:
         - Ref: PyMysqlLayer
 
-      AutoPublishAlias: prod
-      ProvisionedConcurrencyConfig:
-        ProvisionedConcurrentExecutions: 10
+      # AutoPublishAlias: prod
+      # ProvisionedConcurrencyConfig:
+      #   ProvisionedConcurrentExecutions: 10
 
       Policies:
         - AWSLambdaVPCAccessExecutionRole
