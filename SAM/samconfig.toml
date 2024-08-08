@@ -1,8 +1,8 @@
 version = 0.1
 [development.deploy.parameters]
-stack_name = "lamabooks-development-stack"
+stack_name = "lamabook-development-stack"
 s3_bucket = "8586-terraform-state"
-s3_prefix = "lamabooks-development"
+s3_prefix = "lamabook-development"
 region = "us-east-1"
 confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
