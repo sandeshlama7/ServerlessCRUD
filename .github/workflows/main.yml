@@ -170,7 +170,7 @@ jobs:
       - name: Describe CloudFormation Stack for prod
         if: github.ref == 'refs/heads/infra'
         run: |
-          STACK_NAME="lamabooks-${{env.prod_stage}}-stack"
+          STACK_NAME="lamabook-${{env.prod_stage}}-stack"
           OUTPUT_KEY="ApiInvokeURL"
           API_INVOKE_URL=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='$OUTPUT_KEY'].OutputValue" --output text)
           echo "API Invoke URL: $API_INVOKE_URL"
@@ -180,7 +180,7 @@ jobs:
         if: github.ref == 'refs/heads/dev-infra'
         run: |
           STACK_NAME="lamabook-${{env.dev_stage}}-stack"
-          OUTPUT_KEY="ApiInvokeURL" 
+          OUTPUT_KEY="ApiInvokeURL"
           API_INVOKE_URL=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='$OUTPUT_KEY'].OutputValue" --output text)
           echo "API Invoke URL: $API_INVOKE_URL"
           echo "API_INVOKE_URL=$API_INVOKE_URL" >> $GITHUB_ENV
