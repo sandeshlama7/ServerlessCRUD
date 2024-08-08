@@ -8,11 +8,6 @@ module "s3_bucket" {
   control_object_ownership = true
   object_ownership         = "ObjectWriter"
 
-  # website = {
-  #   index_document : "index.html"
-  #   error_document : "index.html"
-  # }
-
   versioning = {
     enabled = local.s3versioning
   }
@@ -29,11 +24,11 @@ module "s3_bucket" {
         }
         Action   = "s3:GetObject"
         Resource = "arn:aws:s3:::${local.frontend_bucket.name}/*"
-        # "Condition" = {
-        #   "StringEquals": {
-        #     "AWS:SourceArn": module.cdn.arn
-        #   }
-        # }
+        "Condition" = {
+          "StringEquals": {
+            "AWS:SourceArn": module.cdn.arn
+          }
+        }
       }
     ]
   })
