@@ -22,7 +22,6 @@ Parameters:
       - testing
   LambdaSG:
     Type: CommaDelimitedList
-    # Type: 'List<AWS::EC2::SecurityGroup::Id>'
     Default: sg-03df20d6d58be3b3a
   PrivateSubnetIds:
     Type: CommaDelimitedList
@@ -84,11 +83,6 @@ Resources:
             Action:
             - secretsmanager:GetSecretValue
             Resource: !Ref SECRET
-          - Sid: RDSConnect
-            Effect: Allow
-            Action:
-            - rds-db:connect
-            Resource: '*'
       VpcConfig:
         SecurityGroupIds: !Ref LambdaSG
         SubnetIds: !Ref PrivateSubnetIds
