@@ -66,14 +66,12 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "${Project}-${Stage}-BooksLambda"
-      MemorySize: 512
+      MemorySize: 128
       CodeUri: lambda/
       Handler: books.lambda_handler
       Layers:
         - Ref: PyMysqlLayer
 
-      DeploymentPreference:
-        Type: AllAtOnce # Or Canary10Percent5Minutes, Linear10PercentEvery1Minute
       AutoPublishAlias: live
       ProvisionedConcurrencyConfig:
         ProvisionedConcurrentExecutions: 10
