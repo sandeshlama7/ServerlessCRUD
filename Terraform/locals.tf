@@ -1,5 +1,6 @@
 locals {
   region = var.region
+  validation_method = var.validation_method
 
   ###### Naming module
   naming_prefix = var.naming_prefix

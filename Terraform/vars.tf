@@ -120,6 +120,12 @@ variable "default_root_object" {
   type        = string
 }
 
+########## ACM
+variable "validation_method" {
+  type = string
+  default = "DNS"
+}
+
 
 ##############
 ## SNS

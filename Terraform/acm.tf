@@ -5,7 +5,7 @@ module "acm" {
   domain_name = local.domain_name
   zone_id     = data.aws_route53_zone.r53zone.zone_id
 
-  validation_method = "DNS"
+  validation_method = local.validation_method
 
   subject_alternative_names = [
     "*.${local.domain_name}",
