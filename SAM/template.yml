@@ -72,9 +72,9 @@ Resources:
       Layers:
         - Ref: PyMysqlLayer
 
-      AutoPublishAlias: live
-      ProvisionedConcurrencyConfig:
-        ProvisionedConcurrentExecutions: 10
+      # AutoPublishAlias: live
+      # ProvisionedConcurrencyConfig:
+      #   ProvisionedConcurrentExecutions: 10
 
       Policies:
         - AWSLambdaVPCAccessExecutionRole
