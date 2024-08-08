@@ -24,11 +24,11 @@ module "s3_bucket" {
         }
         Action   = "s3:GetObject"
         Resource = "arn:aws:s3:::${local.frontend_bucket.name}/*"
-        # "Condition" = {
-        #   "StringEquals": {
-        #     "AWS:SourceArn": module.cdn.arn
-        #   }
-        # }
+        "Condition" = {
+          "StringEquals" : {
+            "AWS:SourceArn" : module.cdn.cloudfront_distribution_arn
+          }
+        }
       }
     ]
   })

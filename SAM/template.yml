@@ -72,11 +72,9 @@ Resources:
       Layers:
         - Ref: PyMysqlLayer
 
-      # DeploymentPreference:
-      #   Type: AllAtOnce # Or Canary10Percent5Minutes, Linear10PercentEvery1Minute
-      # AutoPublishAlias: live
-      # ProvisionedConcurrencyConfig:
-      #   ProvisionedConcurrentExecutions: 10
+      AutoPublishAlias: prod
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 10
 
       Policies:
         - AWSLambdaVPCAccessExecutionRole
@@ -85,7 +83,7 @@ Resources:
             Effect: Allow
             Action:
             - secretsmanager:GetSecretValue
-            Resource: '*'
+            Resource: !Ref SECRET
           - Sid: RDSConnect
             Effect: Allow
             Action:
