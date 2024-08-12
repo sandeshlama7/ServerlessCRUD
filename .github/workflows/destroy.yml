@@ -1,5 +1,7 @@
 name: Infrastructure setup
 
+run-name: Infra destroy by ${{ github.actor }} [${{ github.event.workflow_run.head_commit.message }}]
+
 on:
   push:
     branches: [ "infra", "dev-infra" ]
