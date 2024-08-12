@@ -1,6 +1,6 @@
 name: Infrastructure setup
 
-run-name: Infra provision by ${{ github.actor }} [${{ github.event.workflow_run.head_commit.message }}]
+run-name: Infra provision by ${{ github.actor }} [${{ github.event.head_commit.message }}]
 
 on:
   push:
