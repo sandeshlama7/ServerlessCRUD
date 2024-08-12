@@ -1,7 +1,5 @@
 name: Infrastructure setup
 
-run-name: ${{ github.actor }} is provisioning the infra
-
 on:
   push:
     branches: [ "infra", "main" ]
@@ -23,7 +21,7 @@ jobs:
       - name: Checkout Git Repo
         uses: actions/checkout@v4
 
-      - name: Install Terraform on Runner 
+      - name: Install Terraform on Runner
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
