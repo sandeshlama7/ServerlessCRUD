@@ -41,15 +41,15 @@
 #           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
 #           aws-region: ${{ env.region }}
 
-#       - name: Terraform Init for prod
-#         if: github.ref == 'refs/heads/infra'
-#         run: terraform init  -backend-config="bucket=${{env.backend_bucket}}" -backend-config="key=${{env.prod_backend_key}}" -backend-config="region=${{env.region}}"
-#         working-directory: ${{env.tf_dir}}
+      # - name: Terraform Init for prod
+      #   if: github.ref == 'refs/heads/infra'
+      #   run: terraform init  -backend-config="bucket=${{env.backend_bucket}}" -backend-config="key=${{env.prod_backend_key}}" -backend-config="region=${{env.region}}"
+      #   working-directory: ${{env.tf_dir}}
 
-#       - name: Terraform Init for dev
-#         if: github.ref == 'refs/heads/dev-infra'
-#         run: terraform init  -backend-config="bucket=${{env.backend_bucket}}" -backend-config="key=${{env.dev_backend_key}}" -backend-config="region=${{env.region}}"
-#         working-directory: ${{env.tf_dir}}
+      # - name: Terraform Init for dev
+      #   if: github.ref == 'refs/heads/dev-infra'
+      #   run: terraform init  -backend-config="bucket=${{env.backend_bucket}}" -backend-config="key=${{env.dev_backend_key}}" -backend-config="region=${{env.region}}"
+      #   working-directory: ${{env.tf_dir}}
 
 #       - name: Validate terraform
 #         run: terraform validate
