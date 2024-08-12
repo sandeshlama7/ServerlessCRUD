@@ -1,10 +1,8 @@
 name: Infrastructure setup
 
-run-name: ${{ github.actor }} is provisioning the infra
-
 on:
   push:
-    branches: [ "infra", "dev-infra" ]
+    branches: [ "dev-infra" ]
 
 env:
   tf_dir: Terraform
@@ -28,8 +26,8 @@ jobs:
         with:
           terraform_wrapper: false
 
-      # - name: Install sam cli
-      #   run: pip install aws-sam-cli
+      - name: Install sam cli
+        run: pip install aws-sam-cli
 
       - name: export AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -39,9 +37,9 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ env.region }}
 
-      # - name: Sam Delete
-      #   run: sam delete --config-file samconfig.toml --config-env ${{env.stage}} --no-prompts
-      #   working-directory: ${{env.sam_dir}}
+      - name: Sam Delete
+        run: sam delete --config-file samconfig.toml --config-env ${{env.stage}} --no-prompts
+        working-directory: ${{env.sam_dir}}
 
       - name: Terraform Init
         run: terraform init  -backend-config="bucket=${{env.backend_bucket}}" -backend-config="key=${{env.backend_key}}" -backend-config="region=${{env.region}}"
