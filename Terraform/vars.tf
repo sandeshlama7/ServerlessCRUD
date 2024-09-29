@@ -102,7 +102,7 @@ variable "password_rotation" {
 variable "password_rotation_frequency" {
   description = "The number of days between automatic password rotations"
   type        = number
-  default = 10
+  default     = 10
 }
 variable "deletion_protection" {
   type = bool
@@ -132,10 +132,10 @@ variable "create_topic_policy" {
 variable "subscription_endpoint" {
   description = "The endpoint for the sns topic subscription"
   type        = string
-  default = "sandeshislama7@gmail.com"
+  default     = "sandeshislama7@gmail.com"
 }
 variable "subscription_protocol" {
   description = "The type of sns topic subscription"
   type        = string
-  default = "email"
+  default     = "email"
 }
