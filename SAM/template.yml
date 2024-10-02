@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Description: "Creating the Services Resources for the Serverless Application"
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 180
+    Architectures: [x86_64]
+
+Parameters:
+  Project:
+    Type: String
+    Default: lamabook
+  Stage:
+    Type: String
+    Default: development
+    AllowedValues:
+      - development
+      - production
+      - testing
+  LambdaSG:
+    Type: CommaDelimitedList
+    Default: sg-03df20d6d58be3b3a
+  PrivateSubnetIds:
+    Type: CommaDelimitedList
+    # Type: 'List<AWS::EC2::Subnet:id>'
+    Default: "subnet-0605e6a6661666c06"
+  RDSHOST:
+    Type: String
+    Default: "something"
+  DBNAME:
+    Type: String
+    Default: "books"
+  SECRET:
+    Type: String
+    Default: "secret"
+  USERNAME:
+    Type: String
+    Default: "admin"
+  REGION:
+    Type: String
+    Default: "us-east-1"
+  DOMAIN:
+    Type: String
+    Default: "*sandbox.adex.ltd"
+
+Resources:
+  PyMysqlLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: Layers/pymysql
+      CompatibleRuntimes:
+        - python3.12
+        - python3.11
+      CompatibleArchitectures:
+        - x86_64
+        - arm64
+    Metadata:
+      BuildMethod: python3.12
+      BuildArchitecture: x86_64
+
+  BooksLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Project}-${Stage}-BooksLambda"
+      MemorySize: 512
+      CodeUri: lambda/
+      Handler: books.lambda_handler
+      Layers:
+        - Ref: PyMysqlLayer
+
+      # AutoPublishAlias: prod
+      # ProvisionedConcurrencyConfig:
+      #   ProvisionedConcurrentExecutions: 10
+
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - Statement:
+          - Sid: GetSecrets
+            Effect: Allow
+            Action:
+            - secretsmanager:GetSecretValue
+            Resource: !Ref SECRET
+          - Sid: RDSConnect
+            Effect: Allow
+            Action:
+            - rds-db:connect
+            Resource: '*'
+      VpcConfig:
+        SecurityGroupIds: !Ref LambdaSG
+        SubnetIds: !Ref PrivateSubnetIds
+      Environment:
+        Variables:
+          RDS_PROXY_HOST: !Ref RDSHOST
+          USERNAME: !Ref USERNAME
+          DB_NAME: !Ref DBNAME
+          SECRET: !Ref SECRET
+          REGION: !Ref REGION
+          DOMAIN: !Ref DOMAIN
+
+      Events:
+        AddBook:
+          Type: Api
+          Properties:
+            Path: /books
+            Method: POST
+            RestApiId: !Ref BooksApi
+        GetBooks:
+          Type: Api
+          Properties:
+            Path: /books
+            Method: GET
+            RestApiId: !Ref BooksApi
+        DeleteBook:
+          Type: Api
+          Properties:
+            Path: /books/{id}
+            Method: DELETE
+            RestApiId: !Ref BooksApi
+        GetBook:
+          Type: Api
+          Properties:
+            Path: /books/{id}
+            Method: GET
+            RestApiId: !Ref BooksApi
+        UpdateBook:
+          Type: Api
+          Properties:
+            Path: /books/{id}
+            Method: PUT
+            RestApiId: !Ref BooksApi
+
+
+  BooksApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration: REGIONAL
+      Name: !Sub "${Project}-${Stage}-books-api"
+      StageName: !Ref Stage
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'content-type'"
+        AllowOrigin: "'*'"
+
+
+Outputs:
+  ApiInvokeURL:
+    Description: "Invoke URL for the API"
+    Value: !Sub "https://${BooksApi}.execute-api.${AWS::Region}.amazonaws.com/"

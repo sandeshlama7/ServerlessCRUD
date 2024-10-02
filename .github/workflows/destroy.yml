@@ -1,0 +1,73 @@
+name: Infrastructure setup
+
+run-name: Infra destroy by ${{ github.actor }} [${{ github.event.head_commit.message }}]
+
+on:
+  push:
+    branches: [ "infra", "dev-infra" ]
+
+env:
+  tf_dir: Terraform
+  sam_dir: SAM
+  prod_stage: production
+  dev_stage: development
+  backend_bucket: "8586-terraform-state"
+  dev_backend_key: "sandesh/terraform.tfstate"
+  prod_backend_key: "production/terraform.tfstate"
+  region: "us-east-1"
+  dev_tf_var_file: dev.tfvars
+  prod_tf_var_file: prod.tfvars
+
+jobs:
+  infra-terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Git Repo
+        uses: actions/checkout@v4
+
+      - name: Install Terraform on Runner
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Install sam cli
+        run: pip install aws-sam-cli
+
+      - name: export AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.region }}
+
+      - name: Sam Delete prod
+        if: github.ref == 'refs/heads/infra'
+        run: sam delete --config-file samconfig.toml --config-env ${{env.prod_stage}} --no-prompts
+        working-directory: ${{env.sam_dir}}
+
+      - name: Sam Delete dev
+        if: github.ref == 'refs/heads/dev-infra'
+        run: sam delete --config-file samconfig.toml --config-env ${{env.dev_stage}} --no-prompts
+        working-directory: ${{env.sam_dir}}
+
+      - name: Terraform Init for prod
+        if: github.ref == 'refs/heads/infra'
+        run: terraform init  -backend-config="bucket=${{env.backend_bucket}}" -backend-config="key=${{env.prod_backend_key}}" -backend-config="region=${{env.region}}"
+        working-directory: ${{env.tf_dir}}
+
+      - name: Terraform Init for dev
+        if: github.ref == 'refs/heads/dev-infra'
+        run: terraform init  -backend-config="bucket=${{env.backend_bucket}}" -backend-config="key=${{env.dev_backend_key}}" -backend-config="region=${{env.region}}"
+        working-directory: ${{env.tf_dir}}
+
+      - name: Terraform destroy prod
+        if: github.ref == 'refs/heads/infra'
+        run: terraform destroy -var-file=${{env.prod_tf_var_file}} -auto-approve
+        working-directory: ${{env.tf_dir}}
+
+      - name: Terraform destroy dev
+        if: github.ref == 'refs/heads/dev-infra'
+        run: terraform destroy -var-file=${{env.dev_tf_var_file}} -auto-approve
+        working-directory: ${{env.tf_dir}}
