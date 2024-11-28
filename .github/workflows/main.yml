@@ -5,8 +5,8 @@ run-name: Infra provision by ${{ github.actor }} [${{ github.event.head_commit.m
 on:
   push:
     branches: [ "infra", "dev-infra" ]
-  # pull_request:
-  #   branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 env:
   tf_dir: Terraform
